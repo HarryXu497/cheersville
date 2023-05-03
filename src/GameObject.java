@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public abstract class GameObject {
     // The maximum health of the object, which is also the default health
     private static int DEFAULT_MAXIMUM_HEALTH = 100;
@@ -63,8 +65,44 @@ public abstract class GameObject {
     }
 
     /**
+     * getX
+     * returns the x position of the person
+     * @return the current x position as an int
+     */
+    public int getX() {
+        return this.x;
+    }
+
+    /**
+     * setX
+     * sets the x position of the person
+     * @param x the new x position of the person
+     */
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    /**
+     * getY
+     * returns the y position of the person
+     * @return the current y position as an int
+     */
+    public int getY() {
+        return this.y;
+    }
+
+    /**
+     * setY
+     * sets the y position of the person
+     * @param y the new y position of the person
+     */
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    /**
      * update
-     * called to update the state of the game object (i.e. called once every loop.
+     * called to update the state of the game object (i.e. called once every loop).
      */
     public abstract void update();
 
@@ -73,4 +111,10 @@ public abstract class GameObject {
      * called upon collision with another game object.
      */
     public abstract void collide(GameObject other);
+
+    /**
+     * draw
+     * called to get the item to draw at the time
+     */
+    public abstract Color draw();
 }
