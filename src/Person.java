@@ -2,106 +2,104 @@
 
 import java.awt.*;
 
-public class Person extends GameObject implements Movable {
+public class Person extends GameObject implements Movable, Collidable {
 
     private int age;
     private Sex sex;
-    private Rectangle movableRegion;
 
     /**
-     * constructs a person with a position, sex, and age
-     * @param x the x position of the person
-     * @param y the y position of the person
+     * constructs a person with a sex and age
      * @param sex the biological sex of the person
      * @param age the age of the person
-     * @param movableRegion the region in which the person can move
      * */
-    public Person(int x, int y, Sex sex, int age, Rectangle movableRegion) {
-        super(x, y);
+    public Person(Sex sex, int age) {
+        super();
 
         this.sex = sex;
         this.age = age;
 
-        this.movableRegion = movableRegion;
     }
 
     /**
-     * constructs a person with a position, custom health, sex, and age
-     * @param x the x position of the person
-     * @param y the y position of the person
+     * constructs a person with a custom health, sex, and age
      * @param health the health of the person
      * @param sex the biological sex of the person
      * @param age the age of the person
-     * @param movableRegion the region in which the person can move
      * */
-    public Person(int x, int y, int health, Sex sex, int age, Rectangle movableRegion) {
-        super(x, y, health);
+    public Person(int health, Sex sex, int age) {
+        super(health);
 
         this.sex = sex;
         this.age = age;
-
-        this.movableRegion = movableRegion;
     }
 
     @Override
     public void update() {
         this.age++;
-        this.setHealth(this.getHealth() - 1);
+        this.setHealth(Math.max(this.getHealth() - 2, 0));
     }
 
     @Override
-    public void collide(GameObject other) {
+    public GameObject collide(GameObject other) {
         if (other instanceof Person) {
             Person o = (Person) other;
-            if (((this.sex == Sex.MALE) && (o.sex == Sex.FEMALE)) || ((this.sex == Sex.FEMALE) && (o.sex == Sex.MALE))) {
+            if ((
+                ((this.sex == Sex.MALE) && (o.sex == Sex.FEMALE)) ||
+                ((this.sex == Sex.FEMALE) && (o.sex == Sex.MALE))) &&
+                ((this.age >= 18) && (o.getAge() >= 18))
+            ) {
                 // Reproduce
-                System.out.println("Reproduction");
+                Sex newSex;
+
+                if (Math.random() > 0.5) {
+                    newSex = Sex.FEMALE;
+                } else {
+                    newSex = Sex.MALE;
+                }
+
+                return new Person(newSex, 1);
             }
         }
+
+        return null;
     }
 
     @Override
     public Color draw() {
-        return this.sex == Sex.FEMALE ? Color.YELLOW : Color.BLUE;
+        Color color;
+
+        if (this.age < 18) {
+            return Color.RED;
+        }
+
+        if (this.sex == Sex.FEMALE) {
+            color = Color.YELLOW;
+        } else {
+            color = Color.BLUE;
+        }
+
+        return color;
     }
 
+    /**
+     * move
+     * moves the player in a random direction in one of its 4 adjacent tiles
+     */
     @Override
-    public void move() {
-
-        int nextX = this.getX();
-        int nextY = this.getY();
-
+    public Direction move() {
         // Generate a random valid adjacent position
-        do {
-            // 0: up
-            // 1: down
-            // 2: left
-            // 3: right
-            int moveDirection = (int) (Math.random() * 4);
+        int moveDirection = (int) (Math.random() * 4);
 
-            // move up
-            if (moveDirection == 0) {
-                nextY = this.getY() - 1;
-            }
-
-            // move down
-            if (moveDirection == 1) {
-                nextY = this.getY() + 1;
-            }
-
-            // move left
-            if (moveDirection == 2) {
-                nextX = this.getX() - 1;
-            }
-
-            // move right
-            if (moveDirection == 3) {
-                nextX = this.getX() + 1;
-            }
-        } while (!this.movableRegion.contains(nextX, nextY));
-
-        this.setX(nextX);
-        this.setY(nextY);
+        // move up
+        if (moveDirection == 0) {
+            return Direction.UP;
+        } else if (moveDirection == 1) {
+            return Direction.DOWN;
+        } else if(moveDirection == 2) {
+            return Direction.LEFT;
+        } else {
+            return Direction.RIGHT;
+        }
     }
 
     /**

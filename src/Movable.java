@@ -1,3 +1,3 @@
 public interface Movable {
-    void move();
+    Direction move();
 }

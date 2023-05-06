@@ -3,30 +3,28 @@
  * @author Mangat
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 class Main {
 
 
     public static void main(String[] args) {
 
-        List<GameObject> gameObjects = new ArrayList<>();
+        GameObject[][] map = new GameObject[10][10];
 
-        gameObjects.add(new Person(2, 2, Sex.MALE, 10, new Rectangle(0, 0, 9, 9)));
-        gameObjects.add(new Person(2, 2, Sex.FEMALE, 10, new Rectangle(0, 0, 9, 9)));
-
-
+        map[3][3] = new Person(Sex.MALE, 18);
+        map[4][3] = new Person(Sex.MALE, 18);
+        map[3][4] = new Person(Sex.FEMALE, 18);
+        map[4][4] = new Person(Sex.FEMALE, 18);
+//        map[3][5] = new Zombie(18);
 
         // Initialize Map
-//        moveItemsOnGrid(gameObjects);
+//        moveItemsOnGrid(map);
 
         // display the fake grid on Console
         //DisplayGridOnConsole(map);
 
         //Set up Grid Panel
         // DisplayGrid grid = new DisplayGrid(map);
-        MatrixDisplayWithMouse grid = new MatrixDisplayWithMouse("title", 10, 10, gameObjects);
+        MatrixDisplayWithMouse grid = new MatrixDisplayWithMouse("title", map);
 
         while(true) {
             //Display the grid on a Panel
@@ -34,11 +32,11 @@ class Main {
 
 
             //Small delay
-            try{ Thread.sleep(1000); }catch(Exception e) {};
+            try{ Thread.sleep(100); }catch(Exception e) {};
 
 
             // Initialize Map (Making changes to map)
-            moveItemsOnGrid(gameObjects);
+            moveItemsOnGrid(map);
 
             //Display the grid on a Panel
             grid.refresh();
@@ -47,26 +45,115 @@ class Main {
 
 
     // Method to simulate grid movement
-    public static void moveItemsOnGrid(List<GameObject> gameObjects) {
+    public static void moveItemsOnGrid(GameObject[][] map) {
 
-        GameObject[][] gameObjectMap = new GameObject[10][10];
+        GameObject[][] mapCopy = map.clone();
 
-        for (GameObject obj : gameObjects) {
-            // Move
-            if (obj instanceof Movable) {
-                ((Movable) obj).move();
-            }
-
-            // Collisions
-            if (gameObjectMap[obj.getY()][obj.getX()] != null) {
-                obj.collide(gameObjectMap[obj.getY()][obj.getX()]);
-            }
-
-            gameObjectMap[obj.getY()][obj.getX()] = obj;
-
-            // Update
-            obj.update();
+        for (int i = 0; i < mapCopy.length; i++) {
+            mapCopy[i] = map[i].clone();
         }
+
+        for (int y = 0; y < mapCopy.length; y++) {
+            for (int x = 0; x < mapCopy[y].length; x++) {
+                GameObject currentGameObj = mapCopy[y][x];
+
+                if (currentGameObj == null) {
+                    continue;
+                }
+
+                // Remove dead game objects
+                if (currentGameObj.getHealth() <= 0) {
+                    map[y][x] = null;
+                    continue;
+                }
+
+                // Update object
+                currentGameObj.update();
+
+                if (currentGameObj instanceof Movable) {
+                    Direction direction = ((Movable) currentGameObj).move();
+
+                    int newX = x;
+                    int newY = y;
+
+                    // Move the object
+                    switch (direction) {
+                        case UP:
+                            newY--;
+                            break;
+                        case DOWN:
+                            newY++;
+                            break;
+                        case LEFT:
+                            newX--;
+                            break;
+                        case RIGHT:
+                            newX++;
+                            break;
+                    }
+
+                    // Check if position is valid
+                    if (validPosition(newX, newY, map)) {
+                        // Already an object there
+                        if ((map[newY][newX] != null) && (currentGameObj instanceof Collidable)) {
+                            GameObject objToAdd = ((Collidable) currentGameObj).collide(map[newY][newX]);
+
+                            // Add baby person to an adjacent tile
+                            if (objToAdd instanceof Person) {
+                                Person baby = (Person) objToAdd;
+
+                                int babyX;
+                                int babyY;
+
+                                do {
+                                    babyX = (int) (Math.random() * map[0].length);
+                                    babyY = (int) (Math.random() * map.length);
+//                                    Direction babyDirection = baby.move();
+                                    // Move the object
+//                                    switch (babyDirection) {
+//                                        case UP:
+//                                            babyY--;
+//                                            break;
+//                                        case DOWN:
+//                                            babyY++;
+//                                            break;
+//                                        case LEFT:
+//                                            babyX--;
+//                                            break;
+//                                        case RIGHT:
+//                                            babyX++;
+//                                            break;
+//                                    }
+                                } while ((!validPosition(babyX, babyY, map)) || (map[babyY][babyX] != null));
+
+                                map[babyY][babyX] = baby;
+                            }
+
+                            // Replace person with zombie
+                            if (objToAdd instanceof Zombie) {
+                                map[newY][newX] = objToAdd;
+                            }
+
+                        } else {
+                            map[newY][newX] = currentGameObj;
+                            map[y][x] = null;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean validPosition(int x, int y, GameObject[][] map) {
+        // Valid y index
+        boolean validY = ((0 <= y) && (y < map.length));
+
+        if (!validY) {
+            return false;
+        }
+
+        // Valid x index
+        return ((0 <= x) && (x < map[y].length));
     }
 
     //method to display grid a text for debugging

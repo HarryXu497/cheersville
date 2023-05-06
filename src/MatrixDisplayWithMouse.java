@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
-import java.util.List;
 
 /* [MatrixDisplayWithMouse.java]
  * A small program showing how to use the MatrixDisplayWithMouse class
@@ -16,21 +15,16 @@ import java.util.List;
 
 class MatrixDisplayWithMouse extends JFrame {
 
-    int maxX, maxY, GridToScreenRatio;
-    private List<GameObject> gameObjects;
-    int length;
-    int height;
+    int maxX,maxY, GridToScreenRatio;
+    GameObject[][] matrix;
 
-
-    MatrixDisplayWithMouse(String title, int length, int height, List<GameObject> gameObjects) {
+    MatrixDisplayWithMouse(String title, GameObject[][] matrix) {
         super(title);
 
-        this.gameObjects = gameObjects;
-        this.length = length;
-        this.height = height;
+        this.matrix = matrix;
         maxX = Toolkit.getDefaultToolkit().getScreenSize().width;
         maxY = Toolkit.getDefaultToolkit().getScreenSize().height;
-        GridToScreenRatio = maxY / (this.height+1);  //ratio to fit in screen as square map
+        GridToScreenRatio = maxY / (matrix.length+1);  //ratio to fit in screen as square map
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
@@ -57,23 +51,22 @@ class MatrixDisplayWithMouse extends JFrame {
 
             setDoubleBuffered(true);
             g.setColor(Color.BLACK);
-            g.drawOval(50, 50, 50, 50);
 
 
-            for(int i = 0; i<length;i=i+1)  {
-                for(int j = 0; j<height;j=j+1)  {
-                    g.setColor(Color.WHITE);
-                    g.fillRect(j*GridToScreenRatio, i*GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
+            for(int i = 0; i<matrix[0].length;i=i+1)  {
+                for(int j = 0; j<matrix.length;j=j+1)  {
+                    GameObject currentObject = matrix[i][j];
+
+                    if (currentObject != null) {
+                        g.setColor(matrix[i][j].draw());
+                        g.fillRect(j * GridToScreenRatio, i * GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
+                    }
+
                     g.setColor(Color.BLACK);
                     g.drawRect(j*GridToScreenRatio, i*GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
                 }
             }
 
-            for (GameObject obj : gameObjects) {
-                // Draw object
-                g.setColor(obj.draw());
-                g.fillRect(obj.getY()*GridToScreenRatio, obj.getX()*GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
-            }
 
         }
     }
