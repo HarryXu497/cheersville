@@ -1,52 +1,70 @@
 
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Person extends GameObject implements Movable, Collidable {
+    /**
+     * a double from 0 to 1 that determines at what percentage of the max health is the person considered hungry
+     * This will create a change in behaviour from the person
+     */
+    private static final double HUNGRY_THRESHOLD = 0.5;
 
-    private int age;
-    private Sex sex;
+    /** The sex of the person, which determines if reproduction can occur*/
+    private final Sex sex;
 
     /**
      * constructs a person with a sex and age
      * @param sex the biological sex of the person
-     * @param age the age of the person
      * */
-    public Person(Sex sex, int age) {
+    public Person(Sex sex) {
         super();
 
         this.sex = sex;
-        this.age = age;
-
     }
 
     /**
      * constructs a person with a custom health, sex, and age
      * @param health the health of the person
      * @param sex the biological sex of the person
-     * @param age the age of the person
      * */
-    public Person(int health, Sex sex, int age) {
+    public Person(int health, Sex sex) {
         super(health);
 
         this.sex = sex;
-        this.age = age;
+    }
+
+    /**
+     * isHungry
+     * gets if the person is hungry, marking a change in behaviour
+     * @return if the person is hungry.
+     * */
+    public boolean isHungry() {
+        return this.getHealth() < HUNGRY_THRESHOLD * GameObject.DEFAULT_MAXIMUM_HEALTH;
     }
 
     @Override
     public void update() {
-        this.age++;
-        this.setHealth(Math.max(this.getHealth() - 2, 0));
+        this.setAge(this.getAge() + 1);
+
+        // A person loses health proportional to their age
+        double healthToLose = Math.pow(2, ((1.0 / 100.0) * this.getAge()));
+
+        this.setHealth(Math.max(this.getHealth() - healthToLose, 0));
     }
 
     @Override
     public GameObject collide(GameObject other) {
         if (other instanceof Person) {
-            Person o = (Person) other;
+            Person p = (Person) other;
             if ((
-                ((this.sex == Sex.MALE) && (o.sex == Sex.FEMALE)) ||
-                ((this.sex == Sex.FEMALE) && (o.sex == Sex.MALE))) &&
-                ((this.age >= 18) && (o.getAge() >= 18))
+                ((this.sex == Sex.MALE) && (p.sex == Sex.FEMALE)) ||
+                ((this.sex == Sex.FEMALE) && (p.sex == Sex.MALE))) &&
+                ((this.getAge() >= 18) && (p.getAge() >= 18)) &&
+                ((!this.isHungry()) && (!p.isHungry()))
             ) {
                 // Reproduce
                 Sex newSex;
@@ -57,8 +75,17 @@ public class Person extends GameObject implements Movable, Collidable {
                     newSex = Sex.MALE;
                 }
 
-                return new Person(newSex, 1);
+                return new Person(newSex);
             }
+        }
+
+        if (other instanceof Grass) {
+            Grass g = (Grass) other;
+
+            // replenishes an amount of health, maxing out at the maximum health
+            this.setHealth(Math.min(this.getHealth() + g.getNutritionalValue(), GameObject.DEFAULT_MAXIMUM_HEALTH));
+
+            g.setHealth(0);
         }
 
         return null;
@@ -68,7 +95,7 @@ public class Person extends GameObject implements Movable, Collidable {
     public Color draw() {
         Color color;
 
-        if (this.age < 18) {
+        if (this.getAge() < 18) {
             return Color.RED;
         }
 
@@ -109,14 +136,5 @@ public class Person extends GameObject implements Movable, Collidable {
      */
     public Sex getSex() {
         return this.sex;
-    }
-
-    /**
-     * getAge
-     * returns the age of the person
-     * @return the age of the person as an integer
-     */
-    public int getAge() {
-        return this.age;
     }
 }

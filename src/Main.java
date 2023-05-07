@@ -3,17 +3,22 @@
  * @author Mangat
  */
 
+import java.awt.*;
+import java.util.List;
+
 class Main {
 
 
     public static void main(String[] args) {
 
-        GameObject[][] map = new GameObject[10][10];
+        GameObject[][] map = new GameObject[20][20];
 
-        map[3][3] = new Person(Sex.MALE, 18);
-        map[4][3] = new Person(Sex.MALE, 18);
-        map[3][4] = new Person(Sex.FEMALE, 18);
-        map[4][4] = new Person(Sex.FEMALE, 18);
+        map[3][3] = new Person(Sex.MALE);
+        map[5][5] = new Person(Sex.MALE);
+        map[7][7] = new Person(Sex.FEMALE);
+        map[9][9] = new Person(Sex.FEMALE);
+        map[11][11] = new Grass();
+        map[18][18] = new Zombie();
 //        map[3][5] = new Zombie(18);
 
         // Initialize Map
@@ -70,31 +75,106 @@ class Main {
                 // Update object
                 currentGameObj.update();
 
-                if (currentGameObj instanceof Movable) {
-                    Direction direction = ((Movable) currentGameObj).move();
+                // Move object if it has open adjacent tiles and implements Movable
+                if ((currentGameObj instanceof Movable) && (canMove(x, y, map))) {
+                    Point newLocation;
 
-                    int newX = x;
-                    int newY = y;
+                    // If the person is hungry, move them towards the closest grass tile
+                    if ((currentGameObj instanceof Person) && (((Person) currentGameObj).isHungry())) {
+                        int minDistance = Integer.MAX_VALUE;
+                        Point target = null;
 
-                    // Move the object
-                    switch (direction) {
-                        case UP:
-                            newY--;
-                            break;
-                        case DOWN:
-                            newY++;
-                            break;
-                        case LEFT:
-                            newX--;
-                            break;
-                        case RIGHT:
-                            newX++;
-                            break;
+                        for (int grassY = 0; grassY < mapCopy.length; grassY++) {
+                            for (int grassX = 0; grassX < mapCopy[y].length; grassX++) {
+                                if (map[grassY][grassX] instanceof Grass) {
+                                    int distance = (Math.abs(grassX - x)) + (Math.abs(grassY - y));
+                                    if (distance < minDistance) {
+                                        minDistance = distance;
+                                        target = new Point(grassX, grassY);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Target found
+                        if (target != null) {
+                            Direction direction;
+
+                            if (y > target.y) {
+                                direction = Direction.UP;
+                            } else if (y < target.y) {
+                                direction = Direction.DOWN;
+                            } else if (x < target.x) {
+                                direction = Direction.RIGHT;
+                            } else {
+                                direction = Direction.LEFT;
+                            }
+
+                            newLocation = directionToTile(x, y, direction);
+                        } else {
+                            // TODO: code duplication
+                            // If hungry but no grass, move random
+                            do {
+                                Direction direction = ((Movable) currentGameObj).move();
+                                newLocation = directionToTile(x, y, direction);
+                            } while (!Utils.validPosition(newLocation, map));
+                        }
+                    } else if ((currentGameObj instanceof Zombie) && (((Zombie) currentGameObj).isHunting())) {
+                        int minDistance = Integer.MAX_VALUE;
+                        Point target = null;
+
+                        for (int personY = 0; personY < mapCopy.length; personY++) {
+                            for (int personX = 0; personX < mapCopy[y].length; personX++) {
+                                if (map[personY][personX] instanceof Person) {
+                                    int distance = (Math.abs(personX - x)) + (Math.abs(personY - y));
+                                    if (distance < minDistance) {
+                                        minDistance = distance;
+                                        target = new Point(personX, personY);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Target found
+                        if (target != null) {
+                            Direction direction;
+
+                            if (y > target.y) {
+                                direction = Direction.UP;
+                            }
+                            else if (y < target.y) {
+                                direction = Direction.DOWN;
+                            }
+                            else if (x < target.x) {
+                                direction = Direction.RIGHT;
+                            }
+                            else {
+                                direction = Direction.LEFT;
+                            }
+
+                            newLocation = directionToTile(x, y, direction);
+                        } else {
+                            // TODO: code duplication
+                            // If hungry but no grass, move random
+                            do {
+                                Direction direction = ((Movable) currentGameObj).move();
+                                newLocation = directionToTile(x, y, direction);
+                            } while (!Utils.validPosition(newLocation, map));
+                        }
+                    } else {
+                        // Else use random movement
+                        do {
+                            Direction direction = ((Movable) currentGameObj).move();
+                            newLocation = directionToTile(x, y, direction);
+                        } while (!Utils.validPosition(newLocation, map));
                     }
 
+                    int newX = newLocation.x;
+                    int newY = newLocation.y;
+
                     // Check if position is valid
-                    if (validPosition(newX, newY, map)) {
-                        // Already an object there
+                    if (Utils.validPosition(newX, newY, map)) {
+                        // Collision
                         if ((map[newY][newX] != null) && (currentGameObj instanceof Collidable)) {
                             GameObject objToAdd = ((Collidable) currentGameObj).collide(map[newY][newX]);
 
@@ -108,23 +188,7 @@ class Main {
                                 do {
                                     babyX = (int) (Math.random() * map[0].length);
                                     babyY = (int) (Math.random() * map.length);
-//                                    Direction babyDirection = baby.move();
-                                    // Move the object
-//                                    switch (babyDirection) {
-//                                        case UP:
-//                                            babyY--;
-//                                            break;
-//                                        case DOWN:
-//                                            babyY++;
-//                                            break;
-//                                        case LEFT:
-//                                            babyX--;
-//                                            break;
-//                                        case RIGHT:
-//                                            babyX++;
-//                                            break;
-//                                    }
-                                } while ((!validPosition(babyX, babyY, map)) || (map[babyY][babyX] != null));
+                                } while ((!Utils.validPosition(babyX, babyY, map)) || (map[babyY][babyX] != null));
 
                                 map[babyY][babyX] = baby;
                             }
@@ -134,9 +198,30 @@ class Main {
                                 map[newY][newX] = objToAdd;
                             }
 
-                        } else {
+                            // Move current object over grass
+                            if (map[newY][newX] instanceof Grass) {
+//                                map[newY][newX] = currentGameObj;
+//                                map[y][x] = null;
+                            }
+
+                        }
+                        else {
                             map[newY][newX] = currentGameObj;
                             map[y][x] = null;
+                        }
+                    }
+
+                }
+
+                // Grass
+                if (currentGameObj instanceof Grass) {
+                    List<Direction> neighbors = ((Grass) currentGameObj).reproduce();
+
+                    for (Direction neighbor : neighbors) {
+                        Point point = directionToTile(x, y, neighbor);
+
+                        if ((Utils.validPosition(point, map)) && (map[point.y][point.x] == null)) {
+                            map[point.y][point.x] = new Grass();
                         }
                     }
                 }
@@ -144,16 +229,59 @@ class Main {
         }
     }
 
-    private static boolean validPosition(int x, int y, GameObject[][] map) {
-        // Valid y index
-        boolean validY = ((0 <= y) && (y < map.length));
-
-        if (!validY) {
+    /**
+     * canMove
+     * checks if a game object at a specified point has any open adjacent tiles
+     * The adjacent tile can also be grass, as game objects can walk over grass
+     * */
+    private static boolean canMove(int x, int y, GameObject[][] map) {
+        if (
+                ((!Utils.validPosition(x + 1, y, map)) || ((map[y][x + 1] != null) && !(map[y][x + 1] instanceof Grass))) &&
+                ((!Utils.validPosition(x - 1, y, map)) || ((map[y][x - 1] != null) && !(map[y][x - 1] instanceof Grass))) &&
+                ((!Utils.validPosition(x, y + 1, map)) || ((map[y + 1][x] != null) && !(map[y + 1][x] instanceof Grass))) &&
+                ((!Utils.validPosition(x, y - 1, map)) || ((map[y - 1][x] != null) && !(map[y - 1][x] instanceof Grass)))
+        ) {
             return false;
         }
 
-        // Valid x index
-        return ((0 <= x) && (x < map[y].length));
+        return true;
+    }
+
+    /**
+     * directionToTile
+     * maps a direction and an origin point to the corresponding neighbor
+     * @param point the origin point
+     * @param direction the direction to traverse
+     * */
+    private static Point directionToTile(Point point, Direction direction) {
+        return directionToTile(point.x, point.y, direction);
+    }
+
+    /**
+     * directionToTile
+     * maps a direction and an origin point to the corresponding neighbor
+     * @param x the x coordinate of the origin point
+     * @param y the y coordinate of the origin point
+     * @param direction the direction to traverse
+     * */
+    private static Point directionToTile(int x, int y, Direction direction) {
+        // Move the object
+        switch (direction) {
+            case UP:
+                y--;
+                break;
+            case DOWN:
+                y++;
+                break;
+            case LEFT:
+                x--;
+                break;
+            case RIGHT:
+                x++;
+                break;
+        }
+
+        return new Point(x, y);
     }
 
     //method to display grid a text for debugging

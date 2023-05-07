@@ -2,33 +2,51 @@ import java.awt.*;
 
 public class Zombie extends GameObject implements Movable, Collidable {
 
-    private int age;
+    /**
+     * a double between 1 and 0 which determines how likely it is for zombies to start hunting
+     * */
+    private static final double HUNTING_THRESHOLD = 0.5;
 
-    public Zombie(int age) {
+    private int huntingStartAge;
+    private boolean isHunting;
+
+    public Zombie() {
         super();
 
-        this.age = age;
+        this.huntingStartAge = this.getAge();
+        this.isHunting = false;
     }
 
-    public Zombie(int health, int age) {
+    public Zombie(int health) {
         super(health);
 
-        this.age = age;
-    }
-
-    /**
-     * getAge
-     * gets the age of the zombie
-     * @return the age of the zombie as an int
-     */
-    public int getAge() {
-        return this.age;
+        this.huntingStartAge = this.getAge();
+        this.isHunting = true;
     }
 
     @Override
     public void update() {
-        this.age++;
-        this.setHealth(Math.max(this.getHealth() - 2, 0));
+        this.setAge(this.getAge() + 1);
+
+        if ((!this.isHunting) && (Math.random() > HUNTING_THRESHOLD)) {
+            this.isHunting = true;
+            this.huntingStartAge = this.getAge();
+        }
+
+        if ((this.isHunting) && (this.getAge() - this.huntingStartAge >= 8)) {
+            this.isHunting = false;
+        }
+
+        this.setHealth(Math.max(this.getHealth() - 4, 0));
+    }
+
+    /**
+     * isHunting
+     * if the zombie is on the hunt for a person
+     * @return if the zombie is hunting
+     * */
+    public boolean isHunting() {
+        return this.isHunting;
     }
 
     @Override
@@ -40,8 +58,17 @@ public class Zombie extends GameObject implements Movable, Collidable {
 
             // Infect them
             if (this.getHealth() > person.getHealth()) {
-                return new Zombie(1);
+                return new Zombie();
             }
+
+            // Stop hunting
+            this.isHunting = false;
+        }
+
+        if (other instanceof Grass) {
+            Grass grass = (Grass) other;
+
+            grass.setHealth(0);
         }
 
 
@@ -50,7 +77,7 @@ public class Zombie extends GameObject implements Movable, Collidable {
 
     @Override
     public Color draw() {
-        return Color.GREEN;
+        return Color.BLACK;
     }
 
     /**

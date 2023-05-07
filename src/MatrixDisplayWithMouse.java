@@ -1,8 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.awt.Toolkit;
-import java.awt.Graphics;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
@@ -73,11 +71,20 @@ class MatrixDisplayWithMouse extends JFrame {
 
 
     //Mouse Listener
-    static class MatrixPanelMouseListener implements MouseListener{
+    class MatrixPanelMouseListener implements MouseListener{
         //Mouse Listener Stuff
         public void mousePressed(MouseEvent e) {
             System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
             System.out.println("x: " + e.getPoint().x + ",y: " + e.getPoint().y);
+
+            Point clickedPoint = e.getPoint();
+
+            int x = clickedPoint.x / GridToScreenRatio;
+            int y = clickedPoint.y / GridToScreenRatio;
+
+            if (Utils.validPosition(x, y, matrix)) {
+                matrix[y][x] = new Zombie();
+            }
         }
 
         public void mouseReleased(MouseEvent e) {
