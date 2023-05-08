@@ -18,8 +18,6 @@ class Main {
         map[7][7] = new Person(Sex.FEMALE);
         map[9][9] = new Person(Sex.FEMALE);
         map[11][11] = new Grass();
-        map[18][18] = new Zombie();
-//        map[3][5] = new Zombie(18);
 
         // Initialize Map
 //        moveItemsOnGrid(map);
@@ -107,48 +105,6 @@ class Main {
                             } else if (x < target.x) {
                                 direction = Direction.RIGHT;
                             } else {
-                                direction = Direction.LEFT;
-                            }
-
-                            newLocation = directionToTile(x, y, direction);
-                        } else {
-                            // TODO: code duplication
-                            // If hungry but no grass, move random
-                            do {
-                                Direction direction = ((Movable) currentGameObj).move();
-                                newLocation = directionToTile(x, y, direction);
-                            } while (!Utils.validPosition(newLocation, map));
-                        }
-                    } else if ((currentGameObj instanceof Zombie) && (((Zombie) currentGameObj).isHunting())) {
-                        int minDistance = Integer.MAX_VALUE;
-                        Point target = null;
-
-                        for (int personY = 0; personY < mapCopy.length; personY++) {
-                            for (int personX = 0; personX < mapCopy[y].length; personX++) {
-                                if (map[personY][personX] instanceof Person) {
-                                    int distance = (Math.abs(personX - x)) + (Math.abs(personY - y));
-                                    if (distance < minDistance) {
-                                        minDistance = distance;
-                                        target = new Point(personX, personY);
-                                    }
-                                }
-                            }
-                        }
-
-                        // Target found
-                        if (target != null) {
-                            Direction direction;
-
-                            if (y > target.y) {
-                                direction = Direction.UP;
-                            }
-                            else if (y < target.y) {
-                                direction = Direction.DOWN;
-                            }
-                            else if (x < target.x) {
-                                direction = Direction.RIGHT;
-                            }
-                            else {
                                 direction = Direction.LEFT;
                             }
 

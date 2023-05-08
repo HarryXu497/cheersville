@@ -16,6 +16,15 @@ public class Person extends GameObject implements Movable, Collidable {
     /** The sex of the person, which determines if reproduction can occur*/
     private final Sex sex;
 
+    /** The age when this person can reproduce */
+    private final int AGE_OF_CONSENT = 18;
+
+    /** The amount of years that must go bye before this person can reproduce again */
+    private final int REPRODUCTION_COOLDOWN = 1;
+
+    /** The age when this person reproduced, which allows a cooldown to be implemented */
+    private int lastReproduced = AGE_OF_CONSENT - REPRODUCTION_COOLDOWN;
+
     /**
      * constructs a person with a sex and age
      * @param sex the biological sex of the person
@@ -35,6 +44,24 @@ public class Person extends GameObject implements Movable, Collidable {
         super(health);
 
         this.sex = sex;
+    }
+
+    /**
+     * getLastReproduced
+     * gets the age at which a person last reproduced
+     * @return the age as an int
+     */
+    public int getLastReproduced() {
+        return this.lastReproduced;
+    }
+
+    /**
+     * setLastReproduced
+     * sets the age at which a person last reproduced
+     * @param age the new age as an int
+     */
+    public void setLastReproduced(int age) {
+        this.lastReproduced = age;
     }
 
     /**
@@ -63,8 +90,9 @@ public class Person extends GameObject implements Movable, Collidable {
             if ((
                 ((this.sex == Sex.MALE) && (p.sex == Sex.FEMALE)) ||
                 ((this.sex == Sex.FEMALE) && (p.sex == Sex.MALE))) &&
-                ((this.getAge() >= 18) && (p.getAge() >= 18)) &&
-                ((!this.isHungry()) && (!p.isHungry()))
+                ((this.getAge() >= AGE_OF_CONSENT) && (p.getAge() >= AGE_OF_CONSENT)) &&
+                ((!this.isHungry()) && (!p.isHungry())) &&
+                ((this.getAge() - this.getLastReproduced() >= REPRODUCTION_COOLDOWN) && (p.getAge() - p.getLastReproduced() >= REPRODUCTION_COOLDOWN))
             ) {
                 // Reproduce
                 Sex newSex;
@@ -74,6 +102,10 @@ public class Person extends GameObject implements Movable, Collidable {
                 } else {
                     newSex = Sex.MALE;
                 }
+
+                // Set cooldown
+                this.setLastReproduced(this.getAge());
+                p.setLastReproduced(p.getAge());
 
                 return new Person(newSex);
             }

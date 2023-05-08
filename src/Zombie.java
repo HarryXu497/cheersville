@@ -2,52 +2,23 @@ import java.awt.*;
 
 public class Zombie extends GameObject implements Movable, Collidable {
 
-    /**
-     * a double between 1 and 0 which determines how likely it is for zombies to start hunting
-     * */
-    private static final double HUNTING_THRESHOLD = 0.5;
-
-    private int huntingStartAge;
-    private boolean isHunting;
 
     public Zombie() {
         super();
 
-        this.huntingStartAge = this.getAge();
-        this.isHunting = false;
     }
 
     public Zombie(int health) {
         super(health);
-
-        this.huntingStartAge = this.getAge();
-        this.isHunting = true;
     }
 
     @Override
     public void update() {
         this.setAge(this.getAge() + 1);
 
-        if ((!this.isHunting) && (Math.random() > HUNTING_THRESHOLD)) {
-            this.isHunting = true;
-            this.huntingStartAge = this.getAge();
-        }
-
-        if ((this.isHunting) && (this.getAge() - this.huntingStartAge >= 8)) {
-            this.isHunting = false;
-        }
-
         this.setHealth(Math.max(this.getHealth() - 4, 0));
     }
 
-    /**
-     * isHunting
-     * if the zombie is on the hunt for a person
-     * @return if the zombie is hunting
-     * */
-    public boolean isHunting() {
-        return this.isHunting;
-    }
 
     @Override
     public GameObject collide(GameObject other) {
@@ -60,9 +31,6 @@ public class Zombie extends GameObject implements Movable, Collidable {
             if (this.getHealth() > person.getHealth()) {
                 return new Zombie();
             }
-
-            // Stop hunting
-            this.isHunting = false;
         }
 
         if (other instanceof Grass) {
