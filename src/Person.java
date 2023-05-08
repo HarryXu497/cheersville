@@ -25,6 +25,13 @@ public class Person extends GameObject implements Movable, Collidable {
     /** The age when this person reproduced, which allows a cooldown to be implemented */
     private int lastReproduced = AGE_OF_CONSENT - REPRODUCTION_COOLDOWN;
 
+    private final SpriteList walkingUpSprites;
+    private final SpriteList walkingDownSprites;
+    private final SpriteList walkingLeftSprites;
+    private final SpriteList walkingRightSprites;
+
+    private Image currentSprite;
+
     /**
      * constructs a person with a sex and age
      * @param sex the biological sex of the person
@@ -33,6 +40,12 @@ public class Person extends GameObject implements Movable, Collidable {
         super();
 
         this.sex = sex;
+
+        this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_UP_SPRITES);
+        this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_DOWN_SPRITES);
+        this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_LEFT_SPRITES);
+        this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_RIGHT_SPRITES);
+        this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
     /**
@@ -44,6 +57,12 @@ public class Person extends GameObject implements Movable, Collidable {
         super(health);
 
         this.sex = sex;
+
+        this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_UP_SPRITES);
+        this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_DOWN_SPRITES);
+        this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_LEFT_SPRITES);
+        this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_RIGHT_SPRITES);
+        this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
     /**
@@ -124,20 +143,8 @@ public class Person extends GameObject implements Movable, Collidable {
     }
 
     @Override
-    public Color draw() {
-        Color color;
-
-        if (this.getAge() < 18) {
-            return Color.RED;
-        }
-
-        if (this.sex == Sex.FEMALE) {
-            color = Color.YELLOW;
-        } else {
-            color = Color.BLUE;
-        }
-
-        return color;
+    public Image draw() {
+        return this.currentSprite;
     }
 
     /**
@@ -149,14 +156,17 @@ public class Person extends GameObject implements Movable, Collidable {
         // Generate a random valid adjacent position
         int moveDirection = (int) (Math.random() * 4);
 
-        // move up
         if (moveDirection == 0) {
+            this.currentSprite = this.walkingUpSprites.nextImage();
             return Direction.UP;
         } else if (moveDirection == 1) {
+            this.currentSprite = this.walkingDownSprites.nextImage();
             return Direction.DOWN;
-        } else if(moveDirection == 2) {
+        } else if (moveDirection == 2) {
+            this.currentSprite = this.walkingLeftSprites.nextImage();
             return Direction.LEFT;
         } else {
+            this.currentSprite = this.walkingRightSprites.nextImage();
             return Direction.RIGHT;
         }
     }

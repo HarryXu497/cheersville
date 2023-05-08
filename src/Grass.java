@@ -1,6 +1,5 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,12 +10,12 @@ public class Grass extends GameObject {
     /**
      * A double between 0 and 1 that determines how often the grass reproduces
      */
-    private static final double INDIVIDUAL_REPRODUCTION_THRESHOLD = 0.15;
+    private static final double INDIVIDUAL_REPRODUCTION_THRESHOLD = 0.1;
 
     /**
      * A number between 0 and 1 that determines if the grass reproduces this frame
      */
-    private static final double REPRODUCTION_THRESHOLD = 0.3;
+    private static final double REPRODUCTION_THRESHOLD = 0.2;
 
     /**
      * reproduce
@@ -68,7 +67,12 @@ public class Grass extends GameObject {
     }
 
     @Override
-    public Color draw() {
-        return Color.GREEN;
+    public Image draw() {
+        // TODO: fix this awful code
+        try {
+            return ImageIO.read(new File("grass.png"));
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

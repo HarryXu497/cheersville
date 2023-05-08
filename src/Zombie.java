@@ -2,14 +2,31 @@ import java.awt.*;
 
 public class Zombie extends GameObject implements Movable, Collidable {
 
+    private final SpriteList walkingUpSprites;
+    private final SpriteList walkingDownSprites;
+    private final SpriteList walkingLeftSprites;
+    private final SpriteList walkingRightSprites;
+
+    private Image currentSprite;
 
     public Zombie() {
         super();
 
+        this.walkingUpSprites = new SpriteList(SpriteSheet.ZOMBIE_UP_SPRITES);
+        this.walkingDownSprites = new SpriteList(SpriteSheet.ZOMBIE_DOWN_SPRITES);
+        this.walkingLeftSprites = new SpriteList(SpriteSheet.ZOMBIE_LEFT_SPRITES);
+        this.walkingRightSprites = new SpriteList(SpriteSheet.ZOMBIE_RIGHT_SPRITES);
+        this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
     public Zombie(int health) {
         super(health);
+
+        this.walkingUpSprites = new SpriteList(SpriteSheet.ZOMBIE_UP_SPRITES);
+        this.walkingDownSprites = new SpriteList(SpriteSheet.ZOMBIE_DOWN_SPRITES);
+        this.walkingLeftSprites = new SpriteList(SpriteSheet.ZOMBIE_LEFT_SPRITES);
+        this.walkingRightSprites = new SpriteList(SpriteSheet.ZOMBIE_RIGHT_SPRITES);
+        this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
     @Override
@@ -44,8 +61,8 @@ public class Zombie extends GameObject implements Movable, Collidable {
     }
 
     @Override
-    public Color draw() {
-        return Color.BLACK;
+    public Image draw() {
+        return this.currentSprite;
     }
 
     /**
@@ -57,14 +74,17 @@ public class Zombie extends GameObject implements Movable, Collidable {
         // Generate a random valid adjacent position
         int moveDirection = (int) (Math.random() * 4);
 
-        // move up
         if (moveDirection == 0) {
+            this.currentSprite = this.walkingUpSprites.nextImage();
             return Direction.UP;
         } else if (moveDirection == 1) {
+            this.currentSprite = this.walkingDownSprites.nextImage();
             return Direction.DOWN;
-        } else if(moveDirection == 2) {
+        } else if (moveDirection == 2) {
+            this.currentSprite = this.walkingLeftSprites.nextImage();
             return Direction.LEFT;
         } else {
+            this.currentSprite = this.walkingRightSprites.nextImage();
             return Direction.RIGHT;
         }
     }

@@ -56,8 +56,10 @@ class MatrixDisplayWithMouse extends JFrame {
                     GameObject currentObject = matrix[i][j];
 
                     if (currentObject != null) {
-                        g.setColor(matrix[i][j].draw());
-                        g.fillRect(j * GridToScreenRatio, i * GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
+                        g.drawImage(
+                                matrix[i][j].draw().getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
+                            j*GridToScreenRatio, i*GridToScreenRatio, null
+                        );
                     }
 
                     g.setColor(Color.BLACK);

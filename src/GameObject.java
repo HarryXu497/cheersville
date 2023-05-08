@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 public abstract class GameObject {
     // The maximum health of the object, which is also the default health
@@ -95,5 +94,5 @@ public abstract class GameObject {
      * draw
      * called to get the item to draw
      */
-    public abstract Color draw();
+    public abstract Image draw();
 }

@@ -4,12 +4,23 @@
  */
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 
 class Main {
 
+    /** A double between 0 and 1 that determines how often new grass is added */
+    private static final double NEW_GRASS_THRESHOLD = 0.1;
 
     public static void main(String[] args) {
+        try {
+            SpriteSheet.loadZombieSprites();
+            SpriteSheet.loadPersonSprites();
+        } catch (IOException e) {
+            System.out.println("Image files not found");
+            e.printStackTrace();
+            return;
+        }
 
         GameObject[][] map = new GameObject[20][20];
 
@@ -180,6 +191,22 @@ class Main {
                             map[point.y][point.x] = new Grass();
                         }
                     }
+                }
+            }
+        }
+
+        // Add new grass
+        boolean addNewGrass = Math.random() < NEW_GRASS_THRESHOLD;
+
+        if (addNewGrass) {
+            int numGrass = (int) (Math.random() * 3);
+
+            for (int i = 0; i < numGrass; i++) {
+                int y = (int) (Math.random() * map.length);
+                int x = (int) (Math.random() * map[y].length);
+
+                if (map[y][x] == null) {
+                    map[y][x] = new Grass();
                 }
             }
         }
