@@ -1,5 +1,13 @@
 import java.awt.*;
 
+/**
+ * represents an abstract game object
+ * Additional features:
+ *  - Exceptions
+ *      - exceptions are thrown if illegal arguments (e.g. negative health or age) are inputted (line 37, 40, 62, 65, and 89)
+ * @author Harry Xu
+ * @version 1.0 - May 8th 2023
+ */
 public abstract class GameObject {
     // The maximum health of the object, which is also the default health
     public static final int DEFAULT_MAXIMUM_HEALTH = 100;
@@ -92,7 +100,7 @@ public abstract class GameObject {
 
     /**
      * draw
-     * called to get the item to draw
+     * called to get the image to draw
      */
     public abstract Image draw();
 }

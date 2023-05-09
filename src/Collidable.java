@@ -1,3 +1,8 @@
+/**
+ * Represents a collidable object, whose collide method is called when it tries to move into another game object
+ * @author Harry Xu
+ * @version 1.0 - May 8th 2023
+ */
 public interface Collidable {
     /**
      * collide

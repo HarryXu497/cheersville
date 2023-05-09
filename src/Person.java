@@ -1,11 +1,21 @@
-
-
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
+/**
+ * Represents a person game object
+ * Changes:
+ *  - Hungry-ness: Getting food will be prioritized over reproduction if a person is hungry
+ *      - HUNGRY_THRESHOLD constant (line 24)
+ *      - isHungry method (line 110)
+ *  - Movement: a person is more likely to continue walking in the same direction
+ *      - SAME_DIRECTION_CHANCE constant (line 39)
+ *      - lastDirection to track the previous direction (line 50)
+ *  - Sprites
+ *      - animations and sprites (line 42, 44, 45, 46, 47)
+ *  - Reproduction cooldown
+ *      - lastReproduced instance variable (line 36)
+ * @author Harry Xu
+ * @version 1.0 - May 8th 2023
+ */
 public class Person extends GameObject implements Movable, Collidable {
     /**
      * a double from 0 to 1 that determines at what percentage of the max health is the person considered hungry
@@ -20,17 +30,24 @@ public class Person extends GameObject implements Movable, Collidable {
     private final int AGE_OF_CONSENT = 18;
 
     /** The amount of years that must go bye before this person can reproduce again */
-    private final int REPRODUCTION_COOLDOWN = 1;
+    private final int REPRODUCTION_COOLDOWN = 2;
 
     /** The age when this person reproduced, which allows a cooldown to be implemented */
     private int lastReproduced = AGE_OF_CONSENT - REPRODUCTION_COOLDOWN;
+
+    /** the chance from 0 to 1 that a person remains moving in the same direction */
+    private static final double SAME_DIRECTION_CHANCE = 0.2;
+
+    /** Sprites */
+    private Image currentSprite;
 
     private final SpriteList walkingUpSprites;
     private final SpriteList walkingDownSprites;
     private final SpriteList walkingLeftSprites;
     private final SpriteList walkingRightSprites;
 
-    private Image currentSprite;
+    /** a person is more likely to continue walking in the same direction */
+    private Direction lastDirection;
 
     /**
      * constructs a person with a sex and age
@@ -40,6 +57,8 @@ public class Person extends GameObject implements Movable, Collidable {
         super();
 
         this.sex = sex;
+
+        this.lastDirection = Direction.fromInteger((int) (Math.random() * 3));
 
         this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_UP_SPRITES);
         this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_DOWN_SPRITES);
@@ -92,6 +111,19 @@ public class Person extends GameObject implements Movable, Collidable {
         return this.getHealth() < HUNGRY_THRESHOLD * GameObject.DEFAULT_MAXIMUM_HEALTH;
     }
 
+    /**
+     * getSex
+     * returns the sex of this person
+     * @return the sex of this person as a Sex enum
+     */
+    public Sex getSex() {
+        return this.sex;
+    }
+
+    /**
+     * update
+     * called to update the state of the person object
+     */
     @Override
     public void update() {
         this.setAge(this.getAge() + 1);
@@ -102,6 +134,12 @@ public class Person extends GameObject implements Movable, Collidable {
         this.setHealth(Math.max(this.getHealth() - healthToLose, 0));
     }
 
+    /**
+     * collide
+     * called upon collision with another game object.
+     * @param other the other object in the interaction.
+     * @return a new GameObject or null if no new game object is created
+     */
     @Override
     public GameObject collide(GameObject other) {
         if (other instanceof Person) {
@@ -142,41 +180,49 @@ public class Person extends GameObject implements Movable, Collidable {
         return null;
     }
 
-    @Override
-    public Image draw() {
-        return this.currentSprite;
-    }
-
     /**
      * move
-     * moves the player in a random direction in one of its 4 adjacent tiles
+     * moves the player in a semi-random direction in one of its 4 adjacent tiles
      */
     @Override
     public Direction move() {
+        // person is more likely to continue moving in the same direction
+        if (Math.random() < SAME_DIRECTION_CHANCE) {
+            return this.lastDirection;
+        }
+
         // Generate a random valid adjacent position
         int moveDirection = (int) (Math.random() * 4);
 
-        if (moveDirection == 0) {
-            this.currentSprite = this.walkingUpSprites.nextImage();
-            return Direction.UP;
-        } else if (moveDirection == 1) {
-            this.currentSprite = this.walkingDownSprites.nextImage();
-            return Direction.DOWN;
-        } else if (moveDirection == 2) {
-            this.currentSprite = this.walkingLeftSprites.nextImage();
-            return Direction.LEFT;
-        } else {
-            this.currentSprite = this.walkingRightSprites.nextImage();
-            return Direction.RIGHT;
+        Direction direction = Direction.fromInteger(moveDirection);
+
+        switch (direction) {
+            case UP:
+                this.currentSprite = this.walkingUpSprites.nextImage();
+                break;
+            case DOWN:
+                this.currentSprite = this.walkingDownSprites.nextImage();
+                break;
+            case LEFT:
+                this.currentSprite = this.walkingLeftSprites.nextImage();
+                break;
+            case RIGHT:
+                this.currentSprite = this.walkingRightSprites.nextImage();
+                break;
         }
+
+        // Keep track of the last direction
+        this.lastDirection = direction;
+
+        return direction;
     }
 
     /**
-     * getSex
-     * returns the sex of this person
-     * @return the sex of this person as a Sex enum
+     * draw
+     * called to get the person sprite to draw
      */
-    public Sex getSex() {
-        return this.sex;
+    @Override
+    public Image draw() {
+        return this.currentSprite;
     }
 }

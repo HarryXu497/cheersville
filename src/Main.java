@@ -16,6 +16,8 @@ class Main {
         try {
             SpriteSheet.loadZombieSprites();
             SpriteSheet.loadPersonSprites();
+            SpriteSheet.loadGrassSprites();
+            SpriteSheet.loadDirtSprites();
         } catch (IOException e) {
             System.out.println("Image files not found");
             e.printStackTrace();
@@ -109,14 +111,50 @@ class Main {
                         if (target != null) {
                             Direction direction;
 
-                            if (y > target.y) {
-                                direction = Direction.UP;
-                            } else if (y < target.y) {
-                                direction = Direction.DOWN;
-                            } else if (x < target.x) {
-                                direction = Direction.RIGHT;
+                            // move in a straight line if in axis with the grass
+                            if (y == target.y) {
+                                if (x > target.x) {
+                                    direction = Direction.LEFT;
+                                } else {
+                                    direction = Direction.RIGHT;
+                                }
+                            } else if (x == target.x) {
+                                if (y > target.y) {
+                                    direction = Direction.UP;
+                                } else {
+                                    direction = Direction.DOWN;
+                                }
                             } else {
-                                direction = Direction.LEFT;
+                                // Move in either of the two directions needed to get to the grass
+                                if ((y > target.y) && (x > target.x)) {
+                                    // object is to the bottom right of the target
+                                    if (Math.random() > 0.5) {
+                                        direction = Direction.UP;
+                                    } else {
+                                        direction = Direction.LEFT;
+                                    }
+                                } else if (y > target.y) {
+                                    // object is to the bottom left of the target
+                                    if (Math.random() > 0.5) {
+                                        direction = Direction.UP;
+                                    } else {
+                                        direction = Direction.RIGHT;
+                                    }
+                                } else if (x > target.x) {
+                                    // object is to the top right of the target
+                                    if (Math.random() > 0.5) {
+                                        direction = Direction.DOWN;
+                                    } else {
+                                        direction = Direction.LEFT;
+                                    }
+                                } else {
+                                    // object is to the top left of the target
+                                    if (Math.random() > 0.5) {
+                                        direction = Direction.DOWN;
+                                    } else {
+                                        direction = Direction.LEFT;
+                                    }
+                                }
                             }
 
                             newLocation = directionToTile(x, y, direction);
@@ -163,12 +201,6 @@ class Main {
                             // Replace person with zombie
                             if (objToAdd instanceof Zombie) {
                                 map[newY][newX] = objToAdd;
-                            }
-
-                            // Move current object over grass
-                            if (map[newY][newX] instanceof Grass) {
-//                                map[newY][newX] = currentGameObj;
-//                                map[y][x] = null;
                             }
 
                         }
@@ -265,14 +297,5 @@ class Main {
         }
 
         return new Point(x, y);
-    }
-
-    //method to display grid a text for debugging
-    public static void DisplayGridOnConsole(String[][] map) {
-        for(int i = 0; i<map.length;i++){
-            for(int j = 0; j<map[0].length;j++)
-                System.out.print(map[i][j]+" ");
-            System.out.println("");
-        }
     }
 }

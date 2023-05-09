@@ -1,12 +1,20 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * represents a grass game object
+ * Additional features:
+ *  - Sprites
+ *      - currentSprite instance variable (line 29)
+ *  - Non-constant nutritional value
+ *      - getNutritionalValue method (line 76)
+ *  - Health loss per iteration proportional to age
+ *      - update method (line 85)
+ * @author Harry Xu
+ * @version 1.0 - May 8th 2023
+ */
 public class Grass extends GameObject {
-
     /**
      * A double between 0 and 1 that determines how often the grass reproduces
      */
@@ -16,6 +24,19 @@ public class Grass extends GameObject {
      * A number between 0 and 1 that determines if the grass reproduces this frame
      */
     private static final double REPRODUCTION_THRESHOLD = 0.2;
+
+    /** Sprite */
+    private final Image currentSprite;
+
+    /**
+     * constructs a grass object with a random sprite
+     */
+    public Grass() {
+        int y = (int) (Math.random() * SpriteSheet.GRASS_SPRITES.length);
+        int x = (int) (Math.random() * SpriteSheet.GRASS_SPRITES[y].length);
+
+        this.currentSprite = SpriteSheet.GRASS_SPRITES[y][x];
+    }
 
     /**
      * reproduce
@@ -50,12 +71,16 @@ public class Grass extends GameObject {
     /**
      * getNutritionalValue
      * gets the amount of health a plant restores based on its health
-     *
-     * */
+     * @return the nutritional value (i.e. how much health it replenishes)
+     */
     public double getNutritionalValue() {
         return this.getHealth() / 5;
     }
 
+    /**
+     * update
+     * called to update the state of the grass object
+     */
     @Override
     public void update() {
         this.setAge(this.getAge() + 1);
@@ -66,13 +91,12 @@ public class Grass extends GameObject {
         this.setHealth(Math.max(this.getHealth() - healthToLose, 0));
     }
 
+    /**
+     * draw
+     * called to get the grass sprite to draw
+     */
     @Override
     public Image draw() {
-        // TODO: fix this awful code
-        try {
-            return ImageIO.read(new File("grass.png"));
-        } catch (IOException e) {
-            return null;
-        }
+        return this.currentSprite;
     }
 }

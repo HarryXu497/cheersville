@@ -39,7 +39,16 @@ class MatrixDisplayWithMouse extends JFrame {
     //Inner Class
     class MatrixPanel extends JPanel {
 
+        Image[][] dirtSprites;
+
         MatrixPanel() {
+            this.dirtSprites = new Image[matrix.length][matrix[0].length];
+
+            for (int y = 0; y < matrix.length; y++) {
+                for (int x = 0; x < matrix[y].length; x++) {
+                    this.dirtSprites[y][x] = SpriteSheet.DIRT_SPRITES[(int) (Math.random() * 3)];
+                }
+            }
 
             addMouseListener(new MatrixPanelMouseListener());
         }
@@ -55,19 +64,22 @@ class MatrixDisplayWithMouse extends JFrame {
                 for(int j = 0; j<matrix.length;j=j+1)  {
                     GameObject currentObject = matrix[i][j];
 
+                    g.drawImage(
+                        dirtSprites[i][j].getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
+                        j*GridToScreenRatio, i*GridToScreenRatio, null
+                    );
+
                     if (currentObject != null) {
                         g.drawImage(
-                                matrix[i][j].draw().getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
+                            currentObject.draw().getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
                             j*GridToScreenRatio, i*GridToScreenRatio, null
                         );
                     }
-
-                    g.setColor(Color.BLACK);
-                    g.drawRect(j*GridToScreenRatio, i*GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
                 }
             }
 
-
+            g.setColor(Color.BLACK);
+            g.drawRect(0, 0, matrix.length * GridToScreenRatio, matrix[0].length * GridToScreenRatio);
         }
     }
 
@@ -76,9 +88,6 @@ class MatrixDisplayWithMouse extends JFrame {
     class MatrixPanelMouseListener implements MouseListener{
         //Mouse Listener Stuff
         public void mousePressed(MouseEvent e) {
-            System.out.println("Mouse pressed; # of clicks: " + e.getClickCount());
-            System.out.println("x: " + e.getPoint().x + ",y: " + e.getPoint().y);
-
             Point clickedPoint = e.getPoint();
 
             int x = clickedPoint.x / GridToScreenRatio;

@@ -1,14 +1,23 @@
 import java.awt.*;
 
+/**
+ * represents a zombie game object
+ * @author Harry Xu
+ * @version 1.0 - May 8th 2023
+ * */
 public class Zombie extends GameObject implements Movable, Collidable {
+
+    /** Sprites */
+    private Image currentSprite;
 
     private final SpriteList walkingUpSprites;
     private final SpriteList walkingDownSprites;
     private final SpriteList walkingLeftSprites;
     private final SpriteList walkingRightSprites;
 
-    private Image currentSprite;
-
+    /**
+     * constructs a zombie with a default health
+     */
     public Zombie() {
         super();
 
@@ -19,6 +28,10 @@ public class Zombie extends GameObject implements Movable, Collidable {
         this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
+    /**
+     * constructs a zombie with a custom health
+     * @param health the custom health to spawn with
+     */
     public Zombie(int health) {
         super(health);
 
@@ -29,6 +42,10 @@ public class Zombie extends GameObject implements Movable, Collidable {
         this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
+    /**
+     * update
+     * called to update the state of the zombie object
+     */
     @Override
     public void update() {
         this.setAge(this.getAge() + 1);
@@ -36,7 +53,12 @@ public class Zombie extends GameObject implements Movable, Collidable {
         this.setHealth(Math.max(this.getHealth() - 4, 0));
     }
 
-
+    /**
+     * collide
+     * called upon collision with another game object.
+     * @param other the other object in the interaction.
+     * @return a new {@link GameObject} or null if no new game object is created
+     */
     @Override
     public GameObject collide(GameObject other) {
         if (other instanceof Person) {
@@ -56,13 +78,7 @@ public class Zombie extends GameObject implements Movable, Collidable {
             grass.setHealth(0);
         }
 
-
         return null;
-    }
-
-    @Override
-    public Image draw() {
-        return this.currentSprite;
     }
 
     /**
@@ -74,18 +90,32 @@ public class Zombie extends GameObject implements Movable, Collidable {
         // Generate a random valid adjacent position
         int moveDirection = (int) (Math.random() * 4);
 
-        if (moveDirection == 0) {
-            this.currentSprite = this.walkingUpSprites.nextImage();
-            return Direction.UP;
-        } else if (moveDirection == 1) {
-            this.currentSprite = this.walkingDownSprites.nextImage();
-            return Direction.DOWN;
-        } else if (moveDirection == 2) {
-            this.currentSprite = this.walkingLeftSprites.nextImage();
-            return Direction.LEFT;
-        } else {
-            this.currentSprite = this.walkingRightSprites.nextImage();
-            return Direction.RIGHT;
+        Direction direction = Direction.fromInteger(moveDirection);
+
+        switch (direction) {
+            case UP:
+                this.currentSprite = this.walkingUpSprites.nextImage();
+                break;
+            case DOWN:
+                this.currentSprite = this.walkingDownSprites.nextImage();
+                break;
+            case LEFT:
+                this.currentSprite = this.walkingLeftSprites.nextImage();
+                break;
+            case RIGHT:
+                this.currentSprite = this.walkingRightSprites.nextImage();
+                break;
         }
+
+        return direction;
+    }
+
+    /**
+     * draw
+     * called to get the zombie sprite to draw
+     */
+    @Override
+    public Image draw() {
+        return this.currentSprite;
     }
 }
