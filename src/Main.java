@@ -18,6 +18,7 @@ class Main {
             SpriteSheet.loadPersonSprites();
             SpriteSheet.loadGrassSprites();
             SpriteSheet.loadDirtSprites();
+            SpriteSheet.loadWaterSprites();
         } catch (IOException e) {
             System.out.println("Image files not found");
             e.printStackTrace();
@@ -31,6 +32,7 @@ class Main {
         map[7][7] = new Person(Sex.FEMALE);
         map[9][9] = new Person(Sex.FEMALE);
         map[11][11] = new Grass();
+        map[13][13] = new Water();
 
         // Initialize Map
 //        moveItemsOnGrid(map);

@@ -34,6 +34,10 @@ public class SpriteSheet {
     public static final String DIRT_FILE_PATH = "images/dirt/dirt.png";
     public static Image[] DIRT_SPRITES;
 
+    /** Water Sprites */
+    public static final String WATER_FILE_PATH = "images/water/water.png";
+    public static Image[] WATER_SPRITES;
+
     /**
      * toSpriteMatrix
      * takes a spritesheet and dimensions and converts it into a 2D array of images
@@ -149,5 +153,17 @@ public class SpriteSheet {
         for (int i = 0; i < sprites.length; i++) {
             DIRT_SPRITES[i] = sprites[i][0];
         }
+    }
+
+    /**
+     * loadWaterSprites
+     * loads the water spritesheet into a static variable
+     * @throws IOException if an error occurs during reading the file
+     */
+    public static void loadWaterSprites() throws IOException {
+        File file = new File(WATER_FILE_PATH);
+        BufferedImage spritesheet = ImageIO.read(file);
+
+        WATER_SPRITES = toSpriteMatrix(1, 3, spritesheet)[0];
     }
 }
