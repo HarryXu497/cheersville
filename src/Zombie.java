@@ -63,12 +63,17 @@ public class Zombie extends GameObject implements Movable, Collidable {
     public GameObject collide(GameObject other) {
         if (other instanceof Person) {
             Person person = (Person) other;
+            double personHealth = person.getHealth();
+
             // Kills the person
             person.setHealth(0);
 
-            // Infect them
-            if (this.getHealth() > person.getHealth()) {
+            if (this.getHealth() <= personHealth) {
+                // Infect them
                 return new Zombie();
+            } else {
+                // Increase health
+                this.setHealth(Math.min(this.getHealth() + personHealth, 100));
             }
         }
 

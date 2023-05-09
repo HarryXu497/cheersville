@@ -24,7 +24,7 @@ class Main {
             return;
         }
 
-        GameObject[][] map = new GameObject[20][20];
+        GameObject[][] map = new GameObject[25][25];
 
         map[3][3] = new Person(Sex.MALE);
         map[5][5] = new Person(Sex.MALE);
@@ -95,9 +95,9 @@ class Main {
                         int minDistance = Integer.MAX_VALUE;
                         Point target = null;
 
-                        for (int grassY = 0; grassY < mapCopy.length; grassY++) {
-                            for (int grassX = 0; grassX < mapCopy[y].length; grassX++) {
-                                if (map[grassY][grassX] instanceof Grass) {
+                        for (int grassY = y - 20; grassY < 40; grassY++) {
+                            for (int grassX = x - 20; grassX < 40; grassX++) {
+                                if ((Utils.validPosition(grassX, grassY, map)) && (map[grassY][grassX] instanceof Grass)) {
                                     int distance = (Math.abs(grassX - x)) + (Math.abs(grassY - y));
                                     if (distance < minDistance) {
                                         minDistance = distance;
@@ -109,53 +109,7 @@ class Main {
 
                         // Target found
                         if (target != null) {
-                            Direction direction;
-
-                            // move in a straight line if in axis with the grass
-                            if (y == target.y) {
-                                if (x > target.x) {
-                                    direction = Direction.LEFT;
-                                } else {
-                                    direction = Direction.RIGHT;
-                                }
-                            } else if (x == target.x) {
-                                if (y > target.y) {
-                                    direction = Direction.UP;
-                                } else {
-                                    direction = Direction.DOWN;
-                                }
-                            } else {
-                                // Move in either of the two directions needed to get to the grass
-                                if ((y > target.y) && (x > target.x)) {
-                                    // object is to the bottom right of the target
-                                    if (Math.random() > 0.5) {
-                                        direction = Direction.UP;
-                                    } else {
-                                        direction = Direction.LEFT;
-                                    }
-                                } else if (y > target.y) {
-                                    // object is to the bottom left of the target
-                                    if (Math.random() > 0.5) {
-                                        direction = Direction.UP;
-                                    } else {
-                                        direction = Direction.RIGHT;
-                                    }
-                                } else if (x > target.x) {
-                                    // object is to the top right of the target
-                                    if (Math.random() > 0.5) {
-                                        direction = Direction.DOWN;
-                                    } else {
-                                        direction = Direction.LEFT;
-                                    }
-                                } else {
-                                    // object is to the top left of the target
-                                    if (Math.random() > 0.5) {
-                                        direction = Direction.DOWN;
-                                    } else {
-                                        direction = Direction.LEFT;
-                                    }
-                                }
-                            }
+                            Direction direction = ((Person) currentGameObj).move(new Point(x, y), target);
 
                             newLocation = directionToTile(x, y, direction);
                         } else {
@@ -193,7 +147,7 @@ class Main {
                                 do {
                                     babyX = (int) (Math.random() * map[0].length);
                                     babyY = (int) (Math.random() * map.length);
-                                } while ((!Utils.validPosition(babyX, babyY, map)) || (map[babyY][babyX] != null));
+                                } while ((!Utils.validPosition(babyX, babyY, map)) || (!((map[babyY][babyX] == null) || (map[babyY][babyX] instanceof Grass))));
 
                                 map[babyY][babyX] = baby;
                             }

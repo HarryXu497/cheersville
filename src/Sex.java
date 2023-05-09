@@ -5,5 +5,22 @@
  */
 public enum Sex {
     MALE,
-    FEMALE,
+    FEMALE;
+
+    /**
+     *
+     */
+    public static Sex randomSex() {
+        int sex = (int) (Math.random() * 2);
+
+        switch (sex) {
+            case 0:
+                return Sex.MALE;
+            case 1:
+                return Sex.FEMALE;
+            default:
+                // TODO: ask mangat
+                throw new RuntimeException("This should never happen");
+        }
+    }
 }

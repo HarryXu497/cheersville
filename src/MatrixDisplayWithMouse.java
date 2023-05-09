@@ -1,5 +1,4 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
@@ -27,7 +26,19 @@ class MatrixDisplayWithMouse extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 
-        this.add(new MatrixPanel());
+        MatrixPanel simulation = new MatrixPanel();
+        Sliders sliders = new Sliders();
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, simulation, sliders);
+        splitPane.setDividerLocation(GridToScreenRatio * matrix[0].length);
+
+        splitPane.setOneTouchExpandable(true);
+
+        simulation.setMinimumSize(new Dimension(GridToScreenRatio * matrix[0].length, this.getHeight()));
+
+
+
+        this.add(splitPane);
 
         this.setVisible(true);
     }
@@ -94,7 +105,13 @@ class MatrixDisplayWithMouse extends JFrame {
             int y = clickedPoint.y / GridToScreenRatio;
 
             if (Utils.validPosition(x, y, matrix)) {
-                matrix[y][x] = new Zombie();
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    matrix[y][x] = new Zombie();
+                }
+
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    matrix[y][x] = new Person(Sex.randomSex());
+                }
             }
         }
 
@@ -115,5 +132,4 @@ class MatrixDisplayWithMouse extends JFrame {
         }
 
     }
-
 }

@@ -18,12 +18,15 @@ public class Grass extends GameObject {
     /**
      * A double between 0 and 1 that determines how often the grass reproduces
      */
-    private static final double INDIVIDUAL_REPRODUCTION_THRESHOLD = 0.1;
+    public static final double INDIVIDUAL_REPRODUCTION_THRESHOLD = 0.1;
 
     /**
-     * A number between 0 and 1 that determines if the grass reproduces this frame
+     * A number between 0 and 1 that determines in which directions the grass reproduces this frame
      */
-    private static final double REPRODUCTION_THRESHOLD = 0.2;
+    public static double REPRODUCTION_THRESHOLD = 0.2;
+
+    /** A number between 0 and 1 that determines the percentage of health transfered to the consumer */
+    public static double NUTRITIONAL_VALUE_FACTOR = 0.5;
 
     /** Sprite */
     private final Image currentSprite;
@@ -74,7 +77,7 @@ public class Grass extends GameObject {
      * @return the nutritional value (i.e. how much health it replenishes)
      */
     public double getNutritionalValue() {
-        return this.getHealth() / 5;
+        return this.getHealth() * NUTRITIONAL_VALUE_FACTOR;
     }
 
     /**

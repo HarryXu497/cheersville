@@ -16,12 +16,15 @@ import java.awt.*;
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */
-public class Person extends GameObject implements Movable, Collidable {
+public class Person extends GameObject implements Movable, Collidable, DirectedMovable {
     /**
      * a double from 0 to 1 that determines at what percentage of the max health is the person considered hungry
      * This will create a change in behaviour from the person
      */
-    private static final double HUNGRY_THRESHOLD = 0.5;
+    public static double HUNGRY_THRESHOLD = 0.5;
+
+    /** determines how the health loss rate */
+    public static double HEALTH_LOSS_RATE = 0.01;
 
     /** The sex of the person, which determines if reproduction can occur*/
     private final Sex sex;
@@ -129,7 +132,7 @@ public class Person extends GameObject implements Movable, Collidable {
         this.setAge(this.getAge() + 1);
 
         // A person loses health proportional to their age
-        double healthToLose = Math.pow(2, ((1.0 / 100.0) * this.getAge()));
+        double healthToLose = Math.pow(2, (HEALTH_LOSS_RATE * this.getAge()));
 
         this.setHealth(Math.max(this.getHealth() - healthToLose, 0));
     }
@@ -196,6 +199,101 @@ public class Person extends GameObject implements Movable, Collidable {
 
         Direction direction = Direction.fromInteger(moveDirection);
 
+        // Keep track of the last direction
+        this.lastDirection = direction;
+
+        // Update the sprite to match the direction of movement
+        this.updateSprite(direction);
+
+        return direction;
+    }
+
+    /**
+     * move
+     * moves the player in a "smart" way, being provided the object's position and the target location
+     * @param position the position of the player on the grid
+     * @param target the target position the grid
+     * @return the direction of travel
+     * @throws NullPointerException if either or both of the points are null
+     */
+    @Override
+    public Direction move(Point position, Point target) {
+        if ((position == null) || (target == null)) {
+            throw new NullPointerException("Points must not be null.");
+        }
+
+        Direction direction;
+
+        // move in a straight line if in axis with the grass
+        if (position.y == target.y) {
+            if (position.x > target.x) {
+                direction = Direction.LEFT;
+            } else {
+                direction = Direction.RIGHT;
+            }
+        } else if (position.x == target.x) {
+            if (position.y > target.y) {
+                direction = Direction.UP;
+            } else {
+                direction = Direction.DOWN;
+            }
+        } else {
+            // Move in either of the two directions needed to get to the grass
+            if ((position.y > target.y) && (position.x > target.x)) {
+                // object is to the bottom right of the target
+                if (Math.random() > 0.5) {
+                    direction = Direction.UP;
+                } else {
+                    direction = Direction.LEFT;
+                }
+            } else if (position.y > target.y) {
+                // object is to the bottom left of the target
+                if (Math.random() > 0.5) {
+                    direction = Direction.UP;
+                } else {
+                    direction = Direction.RIGHT;
+                }
+            } else if (position.x > target.x) {
+                // object is to the top right of the target
+                if (Math.random() > 0.5) {
+                    direction = Direction.DOWN;
+                } else {
+                    direction = Direction.LEFT;
+                }
+            } else {
+                // object is to the top left of the target
+                if (Math.random() > 0.5) {
+                    direction = Direction.DOWN;
+                } else {
+                    direction = Direction.LEFT;
+                }
+            }
+        }
+
+        // Keep track of the last direction
+        this.lastDirection = direction;
+
+        // Update the sprite to match the direction of movement
+        this.updateSprite(direction);
+
+        return direction;
+    }
+
+    /**
+     * draw
+     * called to get the person sprite to draw
+     */
+    @Override
+    public Image draw() {
+        return this.currentSprite;
+    }
+
+    /**
+     * updateSprite
+     * updates the sprite in the appropriate fashion according to the direction of movement
+     * @param direction the direction of movement
+     */
+    private void updateSprite(Direction direction) {
         switch (direction) {
             case UP:
                 this.currentSprite = this.walkingUpSprites.nextImage();
@@ -210,19 +308,5 @@ public class Person extends GameObject implements Movable, Collidable {
                 this.currentSprite = this.walkingRightSprites.nextImage();
                 break;
         }
-
-        // Keep track of the last direction
-        this.lastDirection = direction;
-
-        return direction;
-    }
-
-    /**
-     * draw
-     * called to get the person sprite to draw
-     */
-    @Override
-    public Image draw() {
-        return this.currentSprite;
     }
 }
