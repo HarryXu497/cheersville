@@ -63,10 +63,19 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
 
         this.lastDirection = Direction.fromInteger((int) (Math.random() * 3));
 
-        this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_UP_SPRITES);
-        this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_DOWN_SPRITES);
-        this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_LEFT_SPRITES);
-        this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_RIGHT_SPRITES);
+        // Pick from 2 spritesheets
+        if (Math.random() < 0.5) {
+            this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_1_UP_SPRITES);
+            this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_1_DOWN_SPRITES);
+            this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_1_LEFT_SPRITES);
+            this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_1_RIGHT_SPRITES);
+        } else {
+            this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_2_UP_SPRITES);
+            this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_2_DOWN_SPRITES);
+            this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_2_LEFT_SPRITES);
+            this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
+        }
+
         this.currentSprite = this.walkingUpSprites.nextImage();
     }
 
@@ -80,10 +89,19 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
 
         this.sex = sex;
 
-        this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_UP_SPRITES);
-        this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_DOWN_SPRITES);
-        this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_LEFT_SPRITES);
-        this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_RIGHT_SPRITES);
+        // Pick from 2 spritesheets
+        if (Math.random() < 0.5) {
+            this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_1_UP_SPRITES);
+            this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_1_DOWN_SPRITES);
+            this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_1_LEFT_SPRITES);
+            this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_1_RIGHT_SPRITES);
+        } else {
+            this.walkingUpSprites = new SpriteList(SpriteSheet.PERSON_2_UP_SPRITES);
+            this.walkingDownSprites = new SpriteList(SpriteSheet.PERSON_2_DOWN_SPRITES);
+            this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_2_LEFT_SPRITES);
+            this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
+        }
+
         this.currentSprite = this.walkingUpSprites.nextImage();
     }
 

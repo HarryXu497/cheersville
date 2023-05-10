@@ -15,7 +15,8 @@ class Main {
     public static void main(String[] args) {
         try {
             SpriteSheet.loadZombieSprites();
-            SpriteSheet.loadPersonSprites();
+            SpriteSheet.loadPerson1Sprites();
+            SpriteSheet.loadPerson2Sprites();
             SpriteSheet.loadGrassSprites();
             SpriteSheet.loadDirtSprites();
             SpriteSheet.loadWaterSprites();
@@ -35,7 +36,7 @@ class Main {
         map[13][13] = new Water();
 
         // Initialize Map
-//        moveItemsOnGrid(map);
+//        initializeMap(map);
 
         // display the fake grid on Console
         //DisplayGridOnConsole(map);
@@ -216,6 +217,30 @@ class Main {
         }
 
         return true;
+    }
+
+    public static void initializeMap(GameObject[][] map) {
+        // Create a rectangular lake with 2 coordinates
+        int y1 = (int) (Math.random() * map.length);
+        int x1 = (int) (Math.random() * map[y1].length);
+
+        // Ensures the second coordinate is to the bottom right of the first
+        int y2 = y1 + 4 + ((int) (Math.random() * 6));
+        int x2 = x1 + 4 + ((int) (Math.random() * 6));
+
+
+        for (int y = y1; y < y2; y++) {
+            for (int x = x1; x < x2; x++) {
+                map[y][x] = new Water();
+            }
+        }
+
+        // Remove the corners to make a more rounded shape
+        map[y1][x1] = null;
+        map[y1][x2] = null;
+        map[y2][x1] = null;
+        map[y2][x2] = null;
+
     }
 
     /**

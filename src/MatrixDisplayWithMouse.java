@@ -104,7 +104,7 @@ class MatrixDisplayWithMouse extends JFrame {
             int x = clickedPoint.x / GridToScreenRatio;
             int y = clickedPoint.y / GridToScreenRatio;
 
-            if (Utils.validPosition(x, y, matrix)) {
+            if (Utils.validPosition(x, y, matrix) && (!(matrix[y][x] instanceof Water))) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     matrix[y][x] = new Zombie();
                 }

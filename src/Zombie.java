@@ -50,7 +50,7 @@ public class Zombie extends GameObject implements Movable, Collidable {
     public void update() {
         this.setAge(this.getAge() + 1);
 
-        this.setHealth(Math.max(this.getHealth() - 4, 0));
+        this.setHealth(Math.max(this.getHealth() - 1, 0));
     }
 
     /**

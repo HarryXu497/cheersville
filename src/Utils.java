@@ -13,7 +13,7 @@ public class Utils {
      * @param map the reference map
      * @return if the position is in bounds
      */
-    public static boolean validPosition(Point point, GameObject[][] map) {
+    public static boolean validPosition(Point point, Object[][] map) {
         return validPosition(point.x, point.y, map);
     }
 
@@ -25,7 +25,7 @@ public class Utils {
      * @param map the reference map
      * @return if the position is in bounds
      */
-    public static boolean validPosition(int x, int y, GameObject[][] map) {
+    public static boolean validPosition(int x, int y, Object[][] map) {
         // Valid y index
         boolean validY = ((0 <= y) && (y < map.length));
 

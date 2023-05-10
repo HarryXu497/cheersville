@@ -20,11 +20,17 @@ public class SpriteSheet {
     public static List<Image> ZOMBIE_RIGHT_SPRITES;
 
     /** Person Sprites */
-    public static final String PERSON_FILE_PATH = "images/people/walk.png";
-    public static List<Image> PERSON_UP_SPRITES;
-    public static List<Image> PERSON_DOWN_SPRITES;
-    public static List<Image> PERSON_LEFT_SPRITES;
-    public static List<Image> PERSON_RIGHT_SPRITES;
+    public static final String PERSON_1_FILE_PATH = "images/people/walk1.png";
+    public static List<Image> PERSON_1_UP_SPRITES;
+    public static List<Image> PERSON_1_DOWN_SPRITES;
+    public static List<Image> PERSON_1_LEFT_SPRITES;
+    public static List<Image> PERSON_1_RIGHT_SPRITES;
+
+    public static final String PERSON_2_FILE_PATH = "images/people/walk2.png";
+    public static List<Image> PERSON_2_UP_SPRITES;
+    public static List<Image> PERSON_2_DOWN_SPRITES;
+    public static List<Image> PERSON_2_LEFT_SPRITES;
+    public static List<Image> PERSON_2_RIGHT_SPRITES;
 
     /** Grass Sprites */
     public static final String GRASS_FILE_PATH = "images/grass/grass.png";
@@ -102,28 +108,52 @@ public class SpriteSheet {
     }
 
     /**
-     * loadPersonSprites
-     * loads the person spritesheet into a static variable
+     * loadPerson1Sprites
+     * loads the person 1 spritesheet into a static variable
      * @throws IOException if an error occurs during reading the file
      */
-    public static void loadPersonSprites() throws IOException {
-        File file = new File(PERSON_FILE_PATH);
+    public static void loadPerson1Sprites() throws IOException {
+        File file = new File(PERSON_1_FILE_PATH);
         BufferedImage spritesheet = ImageIO.read(file);
 
         Image[][] spriteMatrix = toSpriteMatrix(4, 4, spritesheet);
 
-        PERSON_DOWN_SPRITES = new ArrayList<>();
-        PERSON_UP_SPRITES = new ArrayList<>();
-        PERSON_RIGHT_SPRITES = new ArrayList<>();
-        PERSON_LEFT_SPRITES = new ArrayList<>();
+        PERSON_1_DOWN_SPRITES = new ArrayList<>();
+        PERSON_1_UP_SPRITES = new ArrayList<>();
+        PERSON_1_RIGHT_SPRITES = new ArrayList<>();
+        PERSON_1_LEFT_SPRITES = new ArrayList<>();
 
         for (Image[] row : spriteMatrix) {
-            PERSON_DOWN_SPRITES.add(row[0]);
-            PERSON_UP_SPRITES.add(row[1]);
-            PERSON_RIGHT_SPRITES.add(row[2]);
-            PERSON_LEFT_SPRITES.add(row[3]);
+            PERSON_1_DOWN_SPRITES.add(row[0]);
+            PERSON_1_UP_SPRITES.add(row[1]);
+            PERSON_1_RIGHT_SPRITES.add(row[2]);
+            PERSON_1_LEFT_SPRITES.add(row[3]);
         }
     }
+    /**
+     * loadPerson2Sprites
+     * loads the person 2 spritesheet into a static variable
+     * @throws IOException if an error occurs during reading the file
+     */
+    public static void loadPerson2Sprites() throws IOException {
+        File file = new File(PERSON_2_FILE_PATH);
+        BufferedImage spritesheet = ImageIO.read(file);
+
+        Image[][] spriteMatrix = toSpriteMatrix(4, 4, spritesheet);
+
+        PERSON_2_DOWN_SPRITES = new ArrayList<>();
+        PERSON_2_UP_SPRITES = new ArrayList<>();
+        PERSON_2_RIGHT_SPRITES = new ArrayList<>();
+        PERSON_2_LEFT_SPRITES = new ArrayList<>();
+
+        for (Image[] row : spriteMatrix) {
+            PERSON_2_DOWN_SPRITES.add(row[0]);
+            PERSON_2_UP_SPRITES.add(row[1]);
+            PERSON_2_RIGHT_SPRITES.add(row[2]);
+            PERSON_2_LEFT_SPRITES.add(row[3]);
+        }
+    }
+
 
     /**
      * loadGrassSprites
