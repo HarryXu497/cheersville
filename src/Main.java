@@ -3,6 +3,9 @@
  * @author Mangat
  */
 
+import jdk.nashorn.internal.scripts.JO;
+
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
@@ -26,14 +29,28 @@ class Main {
             return;
         }
 
-        GameObject[][] map = new GameObject[25][25];
+        boolean invalid = true;
+        int dimensions = 0;
 
-        map[3][3] = new Person(Sex.MALE);
-        map[5][5] = new Person(Sex.MALE);
-        map[7][7] = new Person(Sex.FEMALE);
-        map[9][9] = new Person(Sex.FEMALE);
-        map[11][11] = new Grass();
-        map[13][13] = new Water();
+        while (invalid) {
+            try {
+                dimensions = Integer.parseInt(JOptionPane.showInputDialog("What are the dimensions of the board", 25));
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid Input");
+                continue;
+            }
+
+            invalid = false;
+        }
+
+        GameObject[][] map = new GameObject[dimensions][dimensions];
+
+//        map[3][3] = new Person(Sex.MALE);
+//        map[5][5] = new Person(Sex.MALE);
+//        map[7][7] = new Person(Sex.FEMALE);
+//        map[9][9] = new Person(Sex.FEMALE);
+//        map[11][11] = new Grass();
+//        map[13][13] = new Water();
 
         // Initialize Map
 //        initializeMap(map);
