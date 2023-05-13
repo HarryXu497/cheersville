@@ -196,4 +196,68 @@ public class SpriteSheet {
 
         WATER_SPRITES = toSpriteMatrix(1, 3, spritesheet)[0];
     }
+
+    /**
+     * scale
+     * scales all images in this class to a specific size (size x size)
+     * @param size the size of the new image
+     * @throws IllegalArgumentException if the size is not positive
+     */
+    public static void scale(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size " + size + " must be positive");
+        }
+
+        // Zombie
+        scaleList(size, ZOMBIE_LEFT_SPRITES);
+        scaleList(size, ZOMBIE_RIGHT_SPRITES);
+        scaleList(size, ZOMBIE_DOWN_SPRITES);
+        scaleList(size, ZOMBIE_UP_SPRITES);
+
+        // Person 1
+        scaleList(size, PERSON_1_LEFT_SPRITES);
+        scaleList(size, PERSON_1_RIGHT_SPRITES);
+        scaleList(size, PERSON_1_DOWN_SPRITES);
+        scaleList(size, PERSON_1_UP_SPRITES);
+
+        // Person 2
+        scaleList(size, PERSON_2_LEFT_SPRITES);
+        scaleList(size, PERSON_2_RIGHT_SPRITES);
+        scaleList(size, PERSON_2_DOWN_SPRITES);
+        scaleList(size, PERSON_2_UP_SPRITES);
+
+        // Make new array cause error otherwise
+        Image[][] grassImages = new Image[GRASS_SPRITES.length][GRASS_SPRITES[0].length];
+
+        // Grass
+        for (int i = 0; i < GRASS_SPRITES.length; i++) {
+            for (int j = 0; j < GRASS_SPRITES[i].length; j++) {
+                grassImages[i][j] = GRASS_SPRITES[i][j].getScaledInstance(size, size, Image.SCALE_DEFAULT);
+            }
+        }
+
+        GRASS_SPRITES = grassImages;
+
+        // Dirt
+        for (int i = 0; i < DIRT_SPRITES.length; i++) {
+            DIRT_SPRITES[i] = DIRT_SPRITES[i].getScaledInstance(size, size, Image.SCALE_DEFAULT);
+        }
+    }
+
+    /**
+     * scaleList
+     * scales all images in a list to a specific size (size x size)
+     * @param size the size of the new image
+     * @param images the images to resize
+     * @throws IllegalArgumentException if the size is not positive
+     */
+    private static void scaleList(int size, List<Image> images) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("size " + size + " must be positive");
+        }
+
+        for (int i = 0; i < images.size(); i++) {
+            images.set(i, images.get(i).getScaledInstance(size, size, Image.SCALE_DEFAULT));
+        }
+    }
 }

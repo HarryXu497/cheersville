@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 
 /* [MatrixDisplayWithMouse.java]
  * A small program showing how to use the MatrixDisplayWithMouse class
@@ -61,6 +62,10 @@ class MatrixDisplayWithMouse extends JFrame {
                 }
             }
 
+            SpriteSheet.scale(GridToScreenRatio);
+
+
+
             addMouseListener(new MatrixPanelMouseListener());
         }
 
@@ -76,13 +81,13 @@ class MatrixDisplayWithMouse extends JFrame {
                     GameObject currentObject = matrix[i][j];
 
                     g.drawImage(
-                        dirtSprites[i][j].getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
+                        dirtSprites[i][j],
                         j*GridToScreenRatio, i*GridToScreenRatio, null
                     );
 
                     if (currentObject != null) {
                         g.drawImage(
-                            currentObject.draw().getScaledInstance(GridToScreenRatio, GridToScreenRatio, Image.SCALE_DEFAULT),
+                            currentObject.draw(),
                             j*GridToScreenRatio, i*GridToScreenRatio, null
                         );
                     }

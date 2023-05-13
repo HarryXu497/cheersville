@@ -60,7 +60,7 @@ class Main {
 
         //Set up Grid Panel
         // DisplayGrid grid = new DisplayGrid(map);
-        MatrixDisplayWithMouse grid = new MatrixDisplayWithMouse("title", map);
+        MatrixDisplayWithMouse grid = new MatrixDisplayWithMouse("Cheersville", map);
 
         while(true) {
             //Display the grid on a Panel
@@ -164,11 +164,23 @@ class Main {
                                 int babyX;
                                 int babyY;
 
-                                do {
-                                    babyX = (int) (Math.random() * map[0].length);
-                                    babyY = (int) (Math.random() * map.length);
-                                } while ((!Utils.validPosition(babyX, babyY, map)) || (!((map[babyY][babyX] == null) || (map[babyY][babyX] instanceof Grass))));
+                                if (canMove(x, y, map)) {
+                                    // Random adjacent tile
+                                    do {
+                                        Direction direction = ((Movable) baby).move();
+                                        newLocation = directionToTile(x, y, direction);
+                                    } while (!Utils.validPosition(newLocation, map));
 
+                                    babyX = newLocation.x;
+                                    babyY = newLocation.y;
+
+                                } else {
+                                    // Random spawn location
+                                    do {
+                                        babyX = (int) (Math.random() * map[0].length);
+                                        babyY = (int) (Math.random() * map.length);
+                                    } while ((!Utils.validPosition(babyX, babyY, map)) || (!((map[babyY][babyX] == null) || (map[babyY][babyX] instanceof Grass))));
+                                }
                                 map[babyY][babyX] = baby;
                             }
 
