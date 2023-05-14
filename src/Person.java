@@ -8,7 +8,7 @@ import java.awt.*;
  *      - isHungry method (line 110)
  *  - Movement: a person is more likely to continue walking in the same direction
  *      - SAME_DIRECTION_CHANCE constant (line 39)
- *      - lastDirection to track the previous direction (line 50)
+ *      - lastDirection to track the previous direction (line 53)
  *  - Sprites
  *      - animations and sprites (line 42, 44, 45, 46, 47)
  *  - Reproduction cooldown
@@ -41,9 +41,13 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     /** the chance from 0 to 1 that a person remains moving in the same direction */
     private static final double SAME_DIRECTION_CHANCE = 0.2;
 
-    /** Sprites */
-    private Image currentSprite;
+    /** The average vision of a person */
+    public static int AVERAGE_VISION = 15;
 
+    /** The maximum deviation from this vision that can occur */
+    private static final int VISION_DEVIATION = 5;
+
+    /** Sprites */
     private final SpriteList walkingUpSprites;
     private final SpriteList walkingDownSprites;
     private final SpriteList walkingLeftSprites;
@@ -51,6 +55,9 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
 
     /** a person is more likely to continue walking in the same direction */
     private Direction lastDirection;
+
+    /** the radius around which a person can see objects and react to them */
+    private int vision;
 
     /**
      * constructs a person with a sex and age
@@ -61,7 +68,8 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
 
         this.sex = sex;
 
-        this.lastDirection = Direction.fromInteger((int) (Math.random() * 3));
+        // random number
+        this.vision = (int) ((Math.random() * AVERAGE_VISION - VISION_DEVIATION + 1) + (VISION_DEVIATION * 2));
 
         // Pick from 2 spritesheets
         if (Math.random() < 0.5) {
@@ -76,7 +84,8 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
         }
 
-        this.currentSprite = this.walkingUpSprites.nextImage();
+        this.lastDirection = Direction.random();
+        this.updateSprite(this.lastDirection);
     }
 
     /**
@@ -102,7 +111,8 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
         }
 
-        this.currentSprite = this.walkingUpSprites.nextImage();
+        this.lastDirection = Direction.random();
+        this.updateSprite(this.lastDirection);
     }
 
     /**
@@ -139,6 +149,15 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
      */
     public Sex getSex() {
         return this.sex;
+    }
+
+    /**
+     * getVision
+     * returns the vision of this person
+     * @return the vision of this person as an integer
+     */
+    public int getVision() {
+        return this.vision;
     }
 
     /**
@@ -212,10 +231,8 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             return this.lastDirection;
         }
 
-        // Generate a random valid adjacent position
-        int moveDirection = (int) (Math.random() * 4);
-
-        Direction direction = Direction.fromInteger(moveDirection);
+        // Generate a random direction
+        Direction direction = Direction.random();
 
         // Keep track of the last direction
         this.lastDirection = direction;
@@ -298,15 +315,6 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     }
 
     /**
-     * draw
-     * called to get the person sprite to draw
-     */
-    @Override
-    public Image draw() {
-        return this.currentSprite;
-    }
-
-    /**
      * updateSprite
      * updates the sprite in the appropriate fashion according to the direction of movement
      * @param direction the direction of movement
@@ -314,16 +322,16 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     private void updateSprite(Direction direction) {
         switch (direction) {
             case UP:
-                this.currentSprite = this.walkingUpSprites.nextImage();
+                this.setCurrentSprite(this.walkingUpSprites.nextImage());
                 break;
             case DOWN:
-                this.currentSprite = this.walkingDownSprites.nextImage();
+                this.setCurrentSprite(this.walkingDownSprites.nextImage());
                 break;
             case LEFT:
-                this.currentSprite = this.walkingLeftSprites.nextImage();
+                this.setCurrentSprite(this.walkingLeftSprites.nextImage());
                 break;
             case RIGHT:
-                this.currentSprite = this.walkingRightSprites.nextImage();
+                this.setCurrentSprite(this.walkingRightSprites.nextImage());
                 break;
         }
     }

@@ -3,8 +3,6 @@
  * @author Mangat
  */
 
-import jdk.nashorn.internal.scripts.JO;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -13,7 +11,15 @@ import java.util.List;
 class Main {
 
     /** A double between 0 and 1 that determines how often new grass is added */
-    private static final double NEW_GRASS_THRESHOLD = 0.1;
+    public static double NEW_GRASS_THRESHOLD = 0.1;
+
+    /** The generation number */
+    public static int GENERATION = 0;
+
+    /** Game object counts */
+    public static int NUM_PEOPLE = 0;
+    public static int NUM_ZOMBIE = 0;
+    public static int NUM_GRASS = 0;
 
     public static void main(String[] args) {
         try {
@@ -66,6 +72,7 @@ class Main {
             //Display the grid on a Panel
             grid.refresh();
 
+            GENERATION++;
 
             //Small delay
             try{ Thread.sleep(100); }catch(Exception e) {};
@@ -89,6 +96,10 @@ class Main {
             mapCopy[i] = map[i].clone();
         }
 
+        NUM_PEOPLE = 0;
+        NUM_ZOMBIE = 0;
+        NUM_GRASS = 0;
+
         for (int y = 0; y < mapCopy.length; y++) {
             for (int x = 0; x < mapCopy[y].length; x++) {
                 GameObject currentGameObj = mapCopy[y][x];
@@ -106,6 +117,17 @@ class Main {
                 // Update object
                 currentGameObj.update();
 
+                // Object counts
+                if (currentGameObj instanceof Person) {
+                    NUM_PEOPLE++;
+                }
+                if (currentGameObj instanceof Zombie) {
+                    NUM_ZOMBIE++;
+                }
+                if (currentGameObj instanceof Grass) {
+                    NUM_GRASS++;
+                }
+
                 // Move object if it has open adjacent tiles and implements Movable
                 if ((currentGameObj instanceof Movable) && (canMove(x, y, map))) {
                     Point newLocation;
@@ -114,9 +136,10 @@ class Main {
                     if ((currentGameObj instanceof Person) && (((Person) currentGameObj).isHungry())) {
                         int minDistance = Integer.MAX_VALUE;
                         Point target = null;
+                        Person p = ((Person) currentGameObj);
 
-                        for (int grassY = y - 20; grassY < 40; grassY++) {
-                            for (int grassX = x - 20; grassX < 40; grassX++) {
+                        for (int grassY = y - p.getVision(); grassY <= y + p.getVision(); grassY++) {
+                            for (int grassX = x - p.getVision(); grassX <= y + p.getVision(); grassX++) {
                                 if ((Utils.validPosition(grassX, grassY, map)) && (map[grassY][grassX] instanceof Grass)) {
                                     int distance = (Math.abs(grassX - x)) + (Math.abs(grassY - y));
                                     if (distance < minDistance) {
@@ -133,19 +156,12 @@ class Main {
 
                             newLocation = directionToTile(x, y, direction);
                         } else {
-                            // TODO: code duplication
-                            // If hungry but no grass, move random
-                            do {
-                                Direction direction = ((Movable) currentGameObj).move();
-                                newLocation = directionToTile(x, y, direction);
-                            } while (!Utils.validPosition(newLocation, map));
+                            // If hungry but no grass, move randomly
+                            newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
                         }
                     } else {
                         // Else use random movement
-                        do {
-                            Direction direction = ((Movable) currentGameObj).move();
-                            newLocation = directionToTile(x, y, direction);
-                        } while (!Utils.validPosition(newLocation, map));
+                        newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
                     }
 
                     int newX = newLocation.x;
@@ -273,13 +289,22 @@ class Main {
     }
 
     /**
-     * directionToTile
-     * maps a direction and an origin point to the corresponding neighbor
-     * @param point the origin point
-     * @param direction the direction to traverse
+     * generateNextPosition
+     * generates a valid new position point in the map using a game object
+     * @param x the x coordinate of the game object
+     * @param y the y coordinate of the game object
+     * @param currentGameObj the game object to generate the directions from
+     * @param map the game map
      * */
-    private static Point directionToTile(Point point, Direction direction) {
-        return directionToTile(point.x, point.y, direction);
+    private static Point generateNextPosition(int x, int y, Movable currentGameObj, GameObject[][] map) {
+        Point newLocation;
+
+        do {
+            Direction direction = currentGameObj.move();
+            newLocation = directionToTile(x, y, direction);
+        } while ((!Utils.validPosition(newLocation, map)) || ((map[newLocation.y][newLocation.x] != null) && (!(map[newLocation.y][newLocation.x] instanceof Grass))));
+
+        return newLocation;
     }
 
     /**
@@ -288,6 +313,7 @@ class Main {
      * @param x the x coordinate of the origin point
      * @param y the y coordinate of the origin point
      * @param direction the direction to traverse
+     * @return the new generated point
      * */
     private static Point directionToTile(int x, int y, Direction direction) {
         // Move the object

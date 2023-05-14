@@ -14,10 +14,14 @@ public abstract class GameObject {
     // The default age for every game object
     public static final int DEFAULT_AGE = 0;
 
-    // health of the object
+    /** health of the object */
     private double health;
-    // age of the object
+
+    /** age of the object */
     private int age;
+
+    /** current sprite */
+    private Image currentSprite;
 
     /**
      * constructs a new game object with a default health
@@ -93,14 +97,31 @@ public abstract class GameObject {
     }
 
     /**
+     * draw
+     * gets the sprite of the game object to draw
+     * @return the sprite as an Image
+     */
+    public Image draw() {
+        return this.currentSprite;
+    }
+
+    /**
+     * setCurrentSprite
+     * sets the current sprite of the game object
+     * @param currentSprite the new sprite of the object
+     * @throws NullPointerException if the new sprite is null
+     */
+    public void setCurrentSprite(Image currentSprite) {
+        if (currentSprite == null) {
+            throw new NullPointerException("currentSprite cannot be null");
+        }
+
+        this.currentSprite = currentSprite;
+    }
+
+    /**
      * update
      * called to update the state of the game object (i.e. called once every loop).
      */
     public abstract void update();
-
-    /**
-     * draw
-     * called to get the image to draw
-     */
-    public abstract Image draw();
 }

@@ -7,13 +7,17 @@ import java.awt.*;
  * */
 public class Zombie extends GameObject implements Movable, Collidable {
 
-    /** Sprites */
-    private Image currentSprite;
+    /** the chance from 0 to 1 that a person remains moving in the same direction */
+    private static final double SAME_DIRECTION_CHANCE = 0.1;
 
+    /** Sprites */
     private final SpriteList walkingUpSprites;
     private final SpriteList walkingDownSprites;
     private final SpriteList walkingLeftSprites;
     private final SpriteList walkingRightSprites;
+
+    /** a person is more likely to continue walking in the same direction */
+    private Direction lastDirection;
 
     /**
      * constructs a zombie with a default health
@@ -25,7 +29,9 @@ public class Zombie extends GameObject implements Movable, Collidable {
         this.walkingDownSprites = new SpriteList(SpriteSheet.ZOMBIE_DOWN_SPRITES);
         this.walkingLeftSprites = new SpriteList(SpriteSheet.ZOMBIE_LEFT_SPRITES);
         this.walkingRightSprites = new SpriteList(SpriteSheet.ZOMBIE_RIGHT_SPRITES);
-        this.currentSprite = this.walkingUpSprites.nextImage();
+
+        this.lastDirection = Direction.random();
+        this.updateSprite(this.lastDirection);
     }
 
     /**
@@ -39,7 +45,9 @@ public class Zombie extends GameObject implements Movable, Collidable {
         this.walkingDownSprites = new SpriteList(SpriteSheet.ZOMBIE_DOWN_SPRITES);
         this.walkingLeftSprites = new SpriteList(SpriteSheet.ZOMBIE_LEFT_SPRITES);
         this.walkingRightSprites = new SpriteList(SpriteSheet.ZOMBIE_RIGHT_SPRITES);
-        this.currentSprite = this.walkingUpSprites.nextImage();
+
+        this.lastDirection = Direction.random();
+        this.updateSprite(this.lastDirection);
     }
 
     /**
@@ -92,35 +100,42 @@ public class Zombie extends GameObject implements Movable, Collidable {
      */
     @Override
     public Direction move() {
-        // Generate a random valid adjacent position
-        int moveDirection = (int) (Math.random() * 4);
-
-        Direction direction = Direction.fromInteger(moveDirection);
-
-        switch (direction) {
-            case UP:
-                this.currentSprite = this.walkingUpSprites.nextImage();
-                break;
-            case DOWN:
-                this.currentSprite = this.walkingDownSprites.nextImage();
-                break;
-            case LEFT:
-                this.currentSprite = this.walkingLeftSprites.nextImage();
-                break;
-            case RIGHT:
-                this.currentSprite = this.walkingRightSprites.nextImage();
-                break;
+        // zombie is more likely to continue moving in the same direction
+        if (Math.random() < SAME_DIRECTION_CHANCE) {
+            return this.lastDirection;
         }
+
+        // Generate a random direction
+        Direction direction = Direction.random();
+
+        // Keep track of the last direction
+        this.lastDirection = direction;
+
+        // Update the sprite to match the direction of movement
+        this.updateSprite(direction);
 
         return direction;
     }
 
     /**
-     * draw
-     * called to get the zombie sprite to draw
+     * updateSprite
+     * updates the sprite in the appropriate fashion according to the direction of movement
+     * @param direction the direction of movement
      */
-    @Override
-    public Image draw() {
-        return this.currentSprite;
+    private void updateSprite(Direction direction) {
+        switch (direction) {
+            case UP:
+                this.setCurrentSprite(this.walkingUpSprites.nextImage());
+                break;
+            case DOWN:
+                this.setCurrentSprite(this.walkingDownSprites.nextImage());
+                break;
+            case LEFT:
+                this.setCurrentSprite(this.walkingLeftSprites.nextImage());
+                break;
+            case RIGHT:
+                this.setCurrentSprite(this.walkingRightSprites.nextImage());
+                break;
+        }
     }
 }

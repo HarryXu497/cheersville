@@ -1,8 +1,9 @@
+
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 /* [MatrixDisplayWithMouse.java]
  * A small program showing how to use the MatrixDisplayWithMouse class
@@ -15,6 +16,7 @@ class MatrixDisplayWithMouse extends JFrame {
 
     int maxX,maxY, GridToScreenRatio;
     GameObject[][] matrix;
+    Sliders sliders;
 
     MatrixDisplayWithMouse(String title, GameObject[][] matrix) {
         super(title);
@@ -28,16 +30,14 @@ class MatrixDisplayWithMouse extends JFrame {
         this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 
         MatrixPanel simulation = new MatrixPanel();
-        Sliders sliders = new Sliders();
+        this.sliders = new Sliders();
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, simulation, sliders);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, simulation, this.sliders);
         splitPane.setDividerLocation(GridToScreenRatio * matrix[0].length);
 
         splitPane.setOneTouchExpandable(true);
 
         simulation.setMinimumSize(new Dimension(GridToScreenRatio * matrix[0].length, this.getHeight()));
-
-
 
         this.add(splitPane);
 
@@ -45,6 +45,7 @@ class MatrixDisplayWithMouse extends JFrame {
     }
 
     public void refresh() {
+        this.sliders.refresh();
         this.repaint();
     }
 
@@ -54,6 +55,8 @@ class MatrixDisplayWithMouse extends JFrame {
         Image[][] dirtSprites;
 
         MatrixPanel() {
+            SpriteSheet.scale(GridToScreenRatio);
+
             this.dirtSprites = new Image[matrix.length][matrix[0].length];
 
             for (int y = 0; y < matrix.length; y++) {
@@ -61,10 +64,6 @@ class MatrixDisplayWithMouse extends JFrame {
                     this.dirtSprites[y][x] = SpriteSheet.DIRT_SPRITES[(int) (Math.random() * 3)];
                 }
             }
-
-            SpriteSheet.scale(GridToScreenRatio);
-
-
 
             addMouseListener(new MatrixPanelMouseListener());
         }
@@ -117,24 +116,20 @@ class MatrixDisplayWithMouse extends JFrame {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     matrix[y][x] = new Person(Sex.randomSex());
                 }
+
+                if (SwingUtilities.isMiddleMouseButton(e)) {
+                    matrix[y][x] = new Water();
+                }
             }
         }
 
-        public void mouseReleased(MouseEvent e) {
-            System.out.println("Mouse released; # of clicks: " + e.getClickCount());
-        }
+        public void mouseReleased(MouseEvent e) {}
 
-        public void mouseEntered(MouseEvent e) {
-            System.out.println("Mouse entered");
-        }
+        public void mouseEntered(MouseEvent e) {}
 
-        public void mouseExited(MouseEvent e) {
-            System.out.println("Mouse exited");
-        }
+        public void mouseExited(MouseEvent e) {}
 
-        public void mouseClicked(MouseEvent e) {
-            System.out.println("Mouse clicked (# of clicks: "+ e.getClickCount() + ")");
-        }
+        public void mouseClicked(MouseEvent e) {}
 
     }
 }

@@ -28,9 +28,6 @@ public class Grass extends GameObject {
     /** A number between 0 and 1 that determines the percentage of health transfered to the consumer */
     public static double NUTRITIONAL_VALUE_FACTOR = 0.5;
 
-    /** Sprite */
-    private final Image currentSprite;
-
     /**
      * constructs a grass object with a random sprite
      */
@@ -38,7 +35,7 @@ public class Grass extends GameObject {
         int y = (int) (Math.random() * SpriteSheet.GRASS_SPRITES.length);
         int x = (int) (Math.random() * SpriteSheet.GRASS_SPRITES[y].length);
 
-        this.currentSprite = SpriteSheet.GRASS_SPRITES[y][x];
+        this.setCurrentSprite(SpriteSheet.GRASS_SPRITES[y][x]);
     }
 
     /**
@@ -92,14 +89,5 @@ public class Grass extends GameObject {
         double healthToLose = Math.pow(2, ((1.0 / 50.0) * this.getAge()));
 
         this.setHealth(Math.max(this.getHealth() - healthToLose, 0));
-    }
-
-    /**
-     * draw
-     * called to get the grass sprite to draw
-     */
-    @Override
-    public Image draw() {
-        return this.currentSprite;
     }
 }

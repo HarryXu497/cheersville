@@ -70,7 +70,7 @@ public class SpriteSheet {
         int tileWidth = spritesheet.getWidth() / columns;
         int tileHeight = spritesheet.getHeight() / rows;
 
-        BufferedImage[][] sprites = new BufferedImage[rows][columns];
+        Image[][] sprites = new Image[rows][columns];
 
         // Read images
         for (int x = 0; x < columns; x++) {
@@ -226,21 +226,21 @@ public class SpriteSheet {
         scaleList(size, PERSON_2_DOWN_SPRITES);
         scaleList(size, PERSON_2_UP_SPRITES);
 
-        // Make new array cause error otherwise
-        Image[][] grassImages = new Image[GRASS_SPRITES.length][GRASS_SPRITES[0].length];
-
         // Grass
         for (int i = 0; i < GRASS_SPRITES.length; i++) {
             for (int j = 0; j < GRASS_SPRITES[i].length; j++) {
-                grassImages[i][j] = GRASS_SPRITES[i][j].getScaledInstance(size, size, Image.SCALE_DEFAULT);
+                GRASS_SPRITES[i][j] = GRASS_SPRITES[i][j].getScaledInstance(size, size, Image.SCALE_DEFAULT);
             }
         }
-
-        GRASS_SPRITES = grassImages;
 
         // Dirt
         for (int i = 0; i < DIRT_SPRITES.length; i++) {
             DIRT_SPRITES[i] = DIRT_SPRITES[i].getScaledInstance(size, size, Image.SCALE_DEFAULT);
+        }
+
+        // Water
+        for (int i = 0; i < WATER_SPRITES.length; i++) {
+            WATER_SPRITES[i] = WATER_SPRITES[i].getScaledInstance(size, size, Image.SCALE_DEFAULT);
         }
     }
 
