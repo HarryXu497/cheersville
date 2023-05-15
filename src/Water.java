@@ -15,10 +15,15 @@ public class Water extends GameObject {
         this.setCurrentSprite(SpriteSheet.WATER_SPRITES[(int) (Math.random() * 3)]);
     }
 
+    /**
+     * update
+     * called to update the state of the water game object.
+     */
     @Override
     public void update() {
         this.setAge(this.getAge() + 1);
 
+        // Random sprite
         this.setCurrentSprite(SpriteSheet.WATER_SPRITES[(int) (Math.random() * 3)]);
     }
 }

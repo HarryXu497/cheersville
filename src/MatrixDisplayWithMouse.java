@@ -55,8 +55,10 @@ class MatrixDisplayWithMouse extends JFrame {
         Image[][] dirtSprites;
 
         MatrixPanel() {
+            // Scale the images
             SpriteSheet.scale(GridToScreenRatio);
 
+            // Static dirt sprites for each tile in the matrix
             this.dirtSprites = new Image[matrix.length][matrix[0].length];
 
             for (int y = 0; y < matrix.length; y++) {

@@ -4,21 +4,31 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 
+/**
+ * A custom sliders JPanel that manages the game parameters and displays game statistics
+ * @author Harry Xu
+ * @version 1.0 - May 15th 2023
+ */
 class Sliders extends JPanel {
 
+    /** Statistic labels */
     private final JLabel[] labels;
 
+    /** Constructs a Sliders JPanel */
     public Sliders() {
+        // Layout
         this.setLayout(new GridLayout(2, 1));
 
+        // Options tabbed pane
         JTabbedPane pane = new JTabbedPane();
 
-        pane.setBorder(new EmptyBorder(10, 200, 0, 200));
+        pane.setBorder(new EmptyBorder(10, 100, 0, 100));
 
         pane.addTab("People", new PersonPane());
         pane.addTab("Grass", new GrassPane());
         pane.addTab("Zombies", new ZombiePane());
 
+        // Statistics panel
         JPanel stats = new JPanel(new GridLayout(4, 1));
 
         stats.setBorder(new EmptyBorder(50, 0, 150, 0));
@@ -38,6 +48,7 @@ class Sliders extends JPanel {
         this.labels[3] = new JLabel("Grass: " + Main.NUM_GRASS, SwingConstants.CENTER);
         this.labels[3].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 
+        // Adding items to this
         for (JLabel label : this.labels) {
             stats.add(label);
         }
@@ -51,7 +62,7 @@ class Sliders extends JPanel {
 
     /**
      * refresh
-     * Refresh the slider panel;
+     * Refreshes the game statistics panel and repaints
      */
     public void refresh() {
         this.labels[0].setText("Generation " + Main.GENERATION);
@@ -62,10 +73,20 @@ class Sliders extends JPanel {
         this.repaint();
     }
 
+    /**
+     * The Person tab in the options panel
+     * @author Harry Xu
+     * @version 1.0 - May 15th 2023
+     */
     private static class PersonPane extends JPanel implements ChangeListener {
 
+        /** Life expectancy slider */
         private final JSlider slider1;
+
+        /** Hungry-ness coefficient slider */
         private final JSlider slider2;
+
+        /** Average vision slider */
         private final JSlider slider3;
 
         public PersonPane() {
@@ -145,6 +166,11 @@ class Sliders extends JPanel {
             this.setVisible(true);
         }
 
+        /**
+         * stateChanged
+         * changes the appropriate game parameter based on which slider is updates
+         * @param e the {@link ChangeEvent} object
+         */
         @Override
         public void stateChanged(ChangeEvent e) {
             if (e.getSource() == this.slider1) {
@@ -159,10 +185,20 @@ class Sliders extends JPanel {
         }
     }
 
+    /**
+     * The Grass tab in the options panel
+     * @author Harry Xu
+     * @version 1.0 - May 15th 2023
+     */
     private static class GrassPane extends JPanel implements ChangeListener {
 
+        /** Life expectancy slider */
         private final JSlider slider1;
+
+        /** Hungry-ness coefficient slider */
         private final JSlider slider2;
+
+        /** Average vision slider */
         private final JSlider slider3;
 
         public GrassPane() {
@@ -242,6 +278,11 @@ class Sliders extends JPanel {
             this.setVisible(true);
         }
 
+        /**
+         * stateChanged
+         * changes the appropriate game parameter based on which slider is updates
+         * @param e the {@link ChangeEvent} object
+         */
         @Override
         public void stateChanged(ChangeEvent e) {
             if (e.getSource() == this.slider1) {
@@ -256,10 +297,20 @@ class Sliders extends JPanel {
         }
     }
 
+    /**
+     * The Zombie tab in the options panel
+     * @author Harry Xu
+     * @version 1.0 - May 15th 2023
+     */
     private static class ZombiePane extends JPanel implements ChangeListener {
 
+        /** Life expectancy slider */
         private final JSlider slider1;
+
+        /** Hungry-ness coefficient slider */
         private final JSlider slider2;
+
+        /** Average vision slider */
         private final JSlider slider3;
 
         public ZombiePane() {
@@ -342,6 +393,11 @@ class Sliders extends JPanel {
             this.setVisible(true);
         }
 
+        /**
+         * stateChanged
+         * changes the appropriate game parameter based on which slider is updates
+         * @param e the {@link ChangeEvent} object
+         */
         @Override
         public void stateChanged(ChangeEvent e) {
             if (e.getSource() == this.slider1) {

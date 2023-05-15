@@ -9,9 +9,10 @@ import java.awt.*;
  * @version 1.0 - May 8th 2023
  */
 public abstract class GameObject {
-    // The maximum health of the object, which is also the default health
+    /** The maximum health of the object, which is also the default health */
     public static final int DEFAULT_MAXIMUM_HEALTH = 100;
-    // The default age for every game object
+
+    /** The default age for every game object */
     public static final int DEFAULT_AGE = 0;
 
     /** health of the object */

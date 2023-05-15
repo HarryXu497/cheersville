@@ -180,7 +180,7 @@ class Main {
                                     do {
                                         Direction direction = ((Movable) baby).move();
                                         newLocation = directionToTile(x, y, direction);
-                                    } while (!Utils.validPosition(newLocation, map));
+                                    } while (!Utils.validPosition(newLocation, map) || ((map[newLocation.y][newLocation.x] != null) && (!(map[newLocation.y][newLocation.x] instanceof Grass))));
 
                                     babyX = newLocation.x;
                                     babyY = newLocation.y;

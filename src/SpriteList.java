@@ -7,7 +7,10 @@ import java.util.List;
  * @version 1.0 - May 8th 2023
  */
 public class SpriteList {
+    /** The list of sprites to traverse through*/
     private final List<Image> sprites;
+
+    /** determines the current sprite to return */
     private int index;
 
     /**

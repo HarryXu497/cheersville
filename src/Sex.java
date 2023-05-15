@@ -8,7 +8,9 @@ public enum Sex {
     FEMALE;
 
     /**
-     *
+     * randomSex
+     * generates a random sex from this enum
+     * @return a value from this Sex enum
      */
     public static Sex randomSex() {
         int sex = (int) (Math.random() * 2);
