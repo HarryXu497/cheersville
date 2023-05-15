@@ -10,6 +10,9 @@ public class Zombie extends GameObject implements Movable, Collidable {
     /** the chance from 0 to 1 that a person remains moving in the same direction */
     private static final double SAME_DIRECTION_CHANCE = 0.1;
 
+    /** The percentage health loss per update */
+    public static double HEALTH_LOSS_RATE = 0.01;
+
     /** Sprites */
     private final SpriteList walkingUpSprites;
     private final SpriteList walkingDownSprites;
@@ -58,7 +61,7 @@ public class Zombie extends GameObject implements Movable, Collidable {
     public void update() {
         this.setAge(this.getAge() + 1);
 
-        this.setHealth(Math.max(this.getHealth() - 1, 0));
+        this.setHealth(Math.max(this.getHealth() - (HEALTH_LOSS_RATE * GameObject.DEFAULT_MAXIMUM_HEALTH), 0));
     }
 
     /**

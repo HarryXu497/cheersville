@@ -23,7 +23,7 @@ public class Grass extends GameObject {
     /**
      * A number between 0 and 1 that determines in which directions the grass reproduces this frame
      */
-    public static double REPRODUCTION_THRESHOLD = 0.2;
+    public static double REPRODUCTION_THRESHOLD = 0.25;
 
     /** A number between 0 and 1 that determines the percentage of health transfered to the consumer */
     public static double NUTRITIONAL_VALUE_FACTOR = 0.5;

@@ -32,7 +32,7 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     /** The age when this person can reproduce */
     private final int AGE_OF_CONSENT = 18;
 
-    /** The amount of years that must go bye before this person can reproduce again */
+    /** The amount of years that must go by before this person can reproduce again */
     private final int REPRODUCTION_COOLDOWN = 2;
 
     /** The age when this person reproduced, which allows a cooldown to be implemented */
@@ -184,6 +184,7 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     public GameObject collide(GameObject other) {
         if (other instanceof Person) {
             Person p = (Person) other;
+
             if ((
                 ((this.sex == Sex.MALE) && (p.sex == Sex.FEMALE)) ||
                 ((this.sex == Sex.FEMALE) && (p.sex == Sex.MALE))) &&
@@ -192,13 +193,7 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
                 ((this.getAge() - this.getLastReproduced() >= REPRODUCTION_COOLDOWN) && (p.getAge() - p.getLastReproduced() >= REPRODUCTION_COOLDOWN))
             ) {
                 // Reproduce
-                Sex newSex;
-
-                if (Math.random() > 0.5) {
-                    newSex = Sex.FEMALE;
-                } else {
-                    newSex = Sex.MALE;
-                }
+                Sex newSex = Sex.randomSex();
 
                 // Set cooldown
                 this.setLastReproduced(this.getAge());
@@ -257,8 +252,10 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             throw new NullPointerException("Points must not be null.");
         }
 
+        // Default to last direction
         Direction direction;
 
+        // Move towards grass
         // move in a straight line if in axis with the grass
         if (position.y == target.y) {
             if (position.x > target.x) {
@@ -300,7 +297,7 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
                 if (Math.random() > 0.5) {
                     direction = Direction.DOWN;
                 } else {
-                    direction = Direction.LEFT;
+                    direction = Direction.RIGHT;
                 }
             }
         }

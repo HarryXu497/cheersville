@@ -39,8 +39,16 @@ class Main {
         int dimensions = 0;
 
         while (invalid) {
+            String input = JOptionPane.showInputDialog("What are the dimensions of the board", 25);
+
+            // Question card cancelled
+            if (input == null) {
+                return;
+            }
+
+            // Get dimensions
             try {
-                dimensions = Integer.parseInt(JOptionPane.showInputDialog("What are the dimensions of the board", 25));
+                dimensions = Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid Input");
                 continue;
@@ -50,19 +58,6 @@ class Main {
         }
 
         GameObject[][] map = new GameObject[dimensions][dimensions];
-
-//        map[3][3] = new Person(Sex.MALE);
-//        map[5][5] = new Person(Sex.MALE);
-//        map[7][7] = new Person(Sex.FEMALE);
-//        map[9][9] = new Person(Sex.FEMALE);
-//        map[11][11] = new Grass();
-//        map[13][13] = new Water();
-
-        // Initialize Map
-//        initializeMap(map);
-
-        // display the fake grid on Console
-        //DisplayGridOnConsole(map);
 
         //Set up Grid Panel
         // DisplayGrid grid = new DisplayGrid(map);
@@ -195,7 +190,8 @@ class Main {
                                     do {
                                         babyX = (int) (Math.random() * map[0].length);
                                         babyY = (int) (Math.random() * map.length);
-                                    } while ((!Utils.validPosition(babyX, babyY, map)) || (!((map[babyY][babyX] == null) || (map[babyY][babyX] instanceof Grass))));
+                                    } while ((!Utils.validPosition(babyX, babyY, map)) || ((map[babyY][babyX] != null) && (!(map[babyY][babyX] instanceof Grass))));
+
                                 }
                                 map[babyY][babyX] = baby;
                             }
@@ -204,9 +200,7 @@ class Main {
                             if (objToAdd instanceof Zombie) {
                                 map[newY][newX] = objToAdd;
                             }
-
-                        }
-                        else {
+                        } else {
                             map[newY][newX] = currentGameObj;
                             map[y][x] = null;
                         }
@@ -214,7 +208,7 @@ class Main {
 
                 }
 
-                // Grass
+                // Grass Spawning
                 if (currentGameObj instanceof Grass) {
                     List<Direction> neighbors = ((Grass) currentGameObj).reproduce();
 
@@ -264,30 +258,6 @@ class Main {
         return true;
     }
 
-    public static void initializeMap(GameObject[][] map) {
-        // Create a rectangular lake with 2 coordinates
-        int y1 = (int) (Math.random() * map.length);
-        int x1 = (int) (Math.random() * map[y1].length);
-
-        // Ensures the second coordinate is to the bottom right of the first
-        int y2 = y1 + 4 + ((int) (Math.random() * 6));
-        int x2 = x1 + 4 + ((int) (Math.random() * 6));
-
-
-        for (int y = y1; y < y2; y++) {
-            for (int x = x1; x < x2; x++) {
-                map[y][x] = new Water();
-            }
-        }
-
-        // Remove the corners to make a more rounded shape
-        map[y1][x1] = null;
-        map[y1][x2] = null;
-        map[y2][x1] = null;
-        map[y2][x2] = null;
-
-    }
-
     /**
      * generateNextPosition
      * generates a valid new position point in the map using a game object
@@ -302,7 +272,7 @@ class Main {
         do {
             Direction direction = currentGameObj.move();
             newLocation = directionToTile(x, y, direction);
-        } while ((!Utils.validPosition(newLocation, map)) || ((map[newLocation.y][newLocation.x] != null) && (!(map[newLocation.y][newLocation.x] instanceof Grass))));
+        } while ((!Utils.validPosition(newLocation, map)));
 
         return newLocation;
     }
