@@ -1,5 +1,3 @@
-import java.awt.*;
-
 /**
  * represents a zombie game object
  * @author Harry Xu

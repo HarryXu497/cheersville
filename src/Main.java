@@ -49,6 +49,12 @@ class Main {
             // Get dimensions
             try {
                 dimensions = Integer.parseInt(input);
+
+                if (dimensions <= 0) {
+                    JOptionPane.showMessageDialog(null, "Size must be positive");
+                    continue;
+                }
+
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid Input");
                 continue;
