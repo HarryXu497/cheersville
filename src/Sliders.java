@@ -3,21 +3,26 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * A custom sliders JPanel that manages the game parameters and displays game statistics
  * @author Harry Xu
  * @version 1.0 - May 15th 2023
  */
-class Sliders extends JPanel {
+class Sliders extends JPanel implements ActionListener {
 
     /** Statistic labels */
     private final JLabel[] labels;
 
+    /** Selected object labels */
+    private final JLabel[] objectLabels;
+
     /** Constructs a Sliders JPanel */
     public Sliders() {
         // Layout
-        this.setLayout(new GridLayout(2, 1));
+        this.setLayout(new GridLayout(3, 1));
 
         // Options tabbed pane
         JTabbedPane pane = new JTabbedPane();
@@ -48,6 +53,35 @@ class Sliders extends JPanel {
         this.labels[3] = new JLabel("Grass: " + Main.NUM_GRASS, SwingConstants.CENTER);
         this.labels[3].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 
+        // Click select dropdown
+        JPanel selectedObject = new JPanel(new GridLayout(2, 1));
+        JPanel select = new JPanel();
+        JPanel selectedStats = new JPanel(new GridLayout(2, 1));
+        selectedStats.setBorder(new EmptyBorder(0, 0, 100, 0));
+
+        this.objectLabels = new JLabel[2];
+
+        this.objectLabels[0] = new JLabel("", JLabel.CENTER);
+        this.objectLabels[0].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 32));
+        this.objectLabels[1] = new JLabel("", JLabel.CENTER);
+        this.objectLabels[1].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
+
+        selectedStats.add(this.objectLabels[0]);
+        selectedStats.add(this.objectLabels[1]);
+
+        JLabel selectLabel = new JLabel("Upon click, add a ", JLabel.CENTER);
+        selectLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
+        JComboBox<ClickActions> dropdown = new JComboBox<>(ClickActions.values());
+
+        dropdown.addActionListener(this);
+        dropdown.setSelectedIndex(0);
+
+        select.add(selectLabel);
+        select.add(dropdown, JPanel.CENTER_ALIGNMENT);
+
+        selectedObject.add(select);
+        selectedObject.add(selectedStats);
+
         // Adding items to this
         for (JLabel label : this.labels) {
             stats.add(label);
@@ -55,6 +89,7 @@ class Sliders extends JPanel {
 
         this.add(pane);
         this.add(stats);
+        this.add(selectedObject);
 
         this.setVisible(true);
     }
@@ -70,7 +105,22 @@ class Sliders extends JPanel {
         this.labels[2].setText("Zombies: " + Main.NUM_ZOMBIE);
         this.labels[3].setText("Grass: " + Main.NUM_GRASS);
 
+        if (Main.selectedObject == null) {
+            this.objectLabels[0].setText("");
+            this.objectLabels[1].setText("");
+        } else {
+            this.objectLabels[0].setText("Selected Object:");
+            this.objectLabels[1].setText("Health: " + Math.round(((GameObject) Main.selectedObject).getHealth() * 100.0) / 100.0);
+        }
+
+
         this.repaint();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JComboBox<ClickActions> cb = (JComboBox<ClickActions>) e.getSource();
+        MatrixDisplayWithMouse.gameObjectToAdd = (ClickActions) cb.getSelectedItem();
     }
 
     /**

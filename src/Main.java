@@ -21,6 +21,9 @@ class Main {
     public static int NUM_ZOMBIE = 0;
     public static int NUM_GRASS = 0;
 
+    /** selected controllable entity */
+    public static Controllable selectedObject;
+
     public static void main(String[] args) {
         try {
             SpriteSheet.loadZombieSprites();
@@ -111,6 +114,9 @@ class Main {
 
                 // Remove dead game objects
                 if (currentGameObj.getHealth() <= 0) {
+                    if (currentGameObj == selectedObject) {
+                        selectedObject = null;
+                    }
                     map[y][x] = null;
                     continue;
                 }
@@ -133,36 +139,43 @@ class Main {
                 if ((currentGameObj instanceof Movable) && (canMove(x, y, map))) {
                     Point newLocation;
 
-                    // If the person is hungry, move them towards the closest grass tile
-                    if ((currentGameObj instanceof Person) && (((Person) currentGameObj).isHungry())) {
-                        int minDistance = Integer.MAX_VALUE;
-                        Point target = null;
-                        Person p = ((Person) currentGameObj);
+                    if (currentGameObj == selectedObject) {
+                        newLocation = directionToTile(x, y, ((Controllable) currentGameObj).playerMove());
+                        ((Controllable) currentGameObj).setPlayerMove(null);
+                    } else {
+                        // If the person is hungry, move them towards the closest grass tile
+                        if ((currentGameObj instanceof Person) && (((Person) currentGameObj).isHungry())) {
+                            int minDistance = Integer.MAX_VALUE;
+                            Point target = null;
+                            Person p = ((Person) currentGameObj);
 
-                        for (int grassY = y - p.getVision(); grassY <= y + p.getVision(); grassY++) {
-                            for (int grassX = x - p.getVision(); grassX <= y + p.getVision(); grassX++) {
-                                if ((Utils.validPosition(grassX, grassY, map)) && (map[grassY][grassX] instanceof Grass)) {
-                                    int distance = (Math.abs(grassX - x)) + (Math.abs(grassY - y));
-                                    if (distance < minDistance) {
-                                        minDistance = distance;
-                                        target = new Point(grassX, grassY);
+                            for (int grassY = y - p.getVision(); grassY <= y + p.getVision(); grassY++) {
+                                for (int grassX = x - p.getVision(); grassX <= y + p.getVision(); grassX++) {
+                                    if ((Utils.validPosition(grassX, grassY, map)) && (map[grassY][grassX] instanceof Grass)) {
+                                        int distance = (Math.abs(grassX - x)) + (Math.abs(grassY - y));
+                                        if (distance < minDistance) {
+                                            minDistance = distance;
+                                            target = new Point(grassX, grassY);
+                                        }
                                     }
                                 }
                             }
+
+                            // Target found
+                            if (target != null) {
+                                Direction direction = ((Person) currentGameObj).move(new Point(x, y), target);
+
+                                newLocation = directionToTile(x, y, direction);
+                            }
+                            else {
+                                // If hungry but no grass, move randomly
+                                newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
+                            }
                         }
-
-                        // Target found
-                        if (target != null) {
-                            Direction direction = ((Person) currentGameObj).move(new Point(x, y), target);
-
-                            newLocation = directionToTile(x, y, direction);
-                        } else {
-                            // If hungry but no grass, move randomly
+                        else {
+                            // Else use random movement
                             newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
                         }
-                    } else {
-                        // Else use random movement
-                        newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
                     }
 
                     int newX = newLocation.x;
@@ -206,6 +219,11 @@ class Main {
                             if (objToAdd instanceof Zombie) {
                                 map[newY][newX] = objToAdd;
                             }
+
+//                            if (map[newY][newX] instanceof Grass) {
+//                                map[newY][newX] = currentGameObj;
+//                                map[y][x] = null;
+//                            }
                         } else {
                             map[newY][newX] = currentGameObj;
                             map[y][x] = null;
@@ -292,6 +310,11 @@ class Main {
      * @return the new generated point
      * */
     private static Point directionToTile(int x, int y, Direction direction) {
+        // Return the current point if direction is null
+        if (direction == null) {
+            return new Point(x, y);
+        }
+
         // Move the object
         switch (direction) {
             case UP:

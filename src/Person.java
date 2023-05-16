@@ -16,7 +16,7 @@ import java.awt.*;
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */
-public class Person extends GameObject implements Movable, Collidable, DirectedMovable {
+public class Person extends GameObject implements Movable, Collidable, DirectedMovable, Controllable {
     /**
      * a double from 0 to 1 that determines at what percentage of the max health is the person considered hungry
      * This will create a change in behaviour from the person
@@ -58,6 +58,9 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
 
     /** the radius around which a person can see objects and react to them */
     private int vision;
+
+    /** the direction to move in when controlled by the player */
+    private Direction playerDirection;
 
     /**
      * constructs a person with a sex and age
@@ -317,6 +320,11 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
      * @param direction the direction of movement
      */
     private void updateSprite(Direction direction) {
+        // Maintain previous sprite if direction is null
+        if (direction == null) {
+            return;
+        }
+
         switch (direction) {
             case UP:
                 this.setCurrentSprite(this.walkingUpSprites.nextImage());
@@ -331,5 +339,16 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
                 this.setCurrentSprite(this.walkingRightSprites.nextImage());
                 break;
         }
+    }
+
+    @Override
+    public Direction playerMove() {
+        this.updateSprite(this.playerDirection);
+        return this.playerDirection;
+    }
+
+    @Override
+    public void setPlayerMove(Direction direction) {
+        this.playerDirection = direction;
     }
 }

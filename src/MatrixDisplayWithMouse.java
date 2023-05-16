@@ -2,6 +2,8 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
@@ -17,6 +19,8 @@ class MatrixDisplayWithMouse extends JFrame {
     int maxX,maxY, GridToScreenRatio;
     GameObject[][] matrix;
     Sliders sliders;
+
+    public static ClickActions gameObjectToAdd;
 
     MatrixDisplayWithMouse(String title, GameObject[][] matrix) {
         super(title);
@@ -42,6 +46,8 @@ class MatrixDisplayWithMouse extends JFrame {
         this.add(splitPane);
 
         this.setVisible(true);
+
+        addKeyListener(new MatrixPanelKeyListener());
     }
 
     public void refresh() {
@@ -86,6 +92,11 @@ class MatrixDisplayWithMouse extends JFrame {
                         j*GridToScreenRatio, i*GridToScreenRatio, null
                     );
 
+                    if ((Main.selectedObject != null) && (currentObject == Main.selectedObject)) {
+                        g.setColor(Color.RED);
+                        g.fillRect(j * GridToScreenRatio, i * GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
+                    }
+
                     if (currentObject != null) {
                         g.drawImage(
                             currentObject.draw(),
@@ -105,6 +116,8 @@ class MatrixDisplayWithMouse extends JFrame {
     class MatrixPanelMouseListener implements MouseListener{
         //Mouse Listener Stuff
         public void mousePressed(MouseEvent e) {
+            requestFocus();
+
             Point clickedPoint = e.getPoint();
 
             int x = clickedPoint.x / GridToScreenRatio;
@@ -112,16 +125,17 @@ class MatrixDisplayWithMouse extends JFrame {
 
             if (Utils.validPosition(x, y, matrix) && (!(matrix[y][x] instanceof Water))) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    matrix[y][x] = new Zombie();
+                    // Add selected entity
+                    if (gameObjectToAdd != ClickActions.SELECT) {
+                        matrix[y][x] = ClickActions.toGameObject(gameObjectToAdd);
+                    }
+
+                    // Select object
+                    if ((gameObjectToAdd == ClickActions.SELECT) && (matrix[y][x] instanceof Controllable)) {
+                        Main.selectedObject = (Controllable) matrix[y][x];
+                    }
                 }
 
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    matrix[y][x] = new Person(Sex.randomSex());
-                }
-
-                if (SwingUtilities.isMiddleMouseButton(e)) {
-                    matrix[y][x] = new Water();
-                }
             }
         }
 
@@ -133,5 +147,44 @@ class MatrixDisplayWithMouse extends JFrame {
 
         public void mouseClicked(MouseEvent e) {}
 
+    }
+
+    class MatrixPanelKeyListener implements KeyListener {
+
+        @Override
+        public void keyTyped(KeyEvent e) {}
+
+        /**
+         * keyPressed
+         * map each key to a direction
+         * @param e the key event
+         */
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (Main.selectedObject == null) {
+                return;
+            }
+
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    Main.selectedObject.setPlayerMove(Direction.UP);
+                    break;
+
+                case KeyEvent.VK_DOWN:
+                    Main.selectedObject.setPlayerMove(Direction.DOWN);
+                    break;
+
+                case KeyEvent.VK_LEFT:
+                    Main.selectedObject.setPlayerMove(Direction.LEFT);
+                    break;
+
+                case KeyEvent.VK_RIGHT:
+                    Main.selectedObject.setPlayerMove(Direction.RIGHT);
+                    break;
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {}
     }
 }

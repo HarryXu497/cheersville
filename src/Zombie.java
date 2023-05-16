@@ -3,7 +3,7 @@
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  * */
-public class Zombie extends GameObject implements Movable, Collidable {
+public class Zombie extends GameObject implements Movable, Collidable, Controllable {
 
     /** the chance from 0 to 1 that a person remains moving in the same direction */
     private static final double SAME_DIRECTION_CHANCE = 0.1;
@@ -17,8 +17,11 @@ public class Zombie extends GameObject implements Movable, Collidable {
     private final SpriteList walkingLeftSprites;
     private final SpriteList walkingRightSprites;
 
-    /** a person is more likely to continue walking in the same direction */
+    /** a zombie is more likely to continue walking in the same direction */
     private Direction lastDirection;
+
+    /** the direction to move in when controlled by the player */
+    private Direction playerDirection;
 
     /**
      * constructs a zombie with a default health
@@ -124,6 +127,11 @@ public class Zombie extends GameObject implements Movable, Collidable {
      * @param direction the direction of movement
      */
     private void updateSprite(Direction direction) {
+        // Maintain previous sprite if direction is null
+        if (direction == null) {
+            return;
+        }
+
         switch (direction) {
             case UP:
                 this.setCurrentSprite(this.walkingUpSprites.nextImage());
@@ -138,5 +146,16 @@ public class Zombie extends GameObject implements Movable, Collidable {
                 this.setCurrentSprite(this.walkingRightSprites.nextImage());
                 break;
         }
+    }
+
+    @Override
+    public Direction playerMove() {
+        this.updateSprite(this.playerDirection);
+        return this.playerDirection;
+    }
+
+    @Override
+    public void setPlayerMove(Direction direction) {
+        this.playerDirection = direction;
     }
 }
