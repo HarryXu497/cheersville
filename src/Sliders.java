@@ -22,12 +22,10 @@ class Sliders extends JPanel implements ActionListener {
     /** Constructs a Sliders JPanel */
     public Sliders() {
         // Layout
-        this.setLayout(new GridLayout(3, 1));
+        this.setLayout(new GridBagLayout());
 
         // Options tabbed pane
         JTabbedPane pane = new JTabbedPane();
-
-        pane.setBorder(new EmptyBorder(10, 100, 0, 100));
 
         pane.addTab("People", new PersonPane());
         pane.addTab("Grass", new GrassPane());
@@ -35,8 +33,6 @@ class Sliders extends JPanel implements ActionListener {
 
         // Statistics panel
         JPanel stats = new JPanel(new GridLayout(4, 1));
-
-        stats.setBorder(new EmptyBorder(50, 0, 150, 0));
 
         // Stat labels
         this.labels = new JLabel[4];
@@ -55,9 +51,10 @@ class Sliders extends JPanel implements ActionListener {
 
         // Click select dropdown
         JPanel selectedObject = new JPanel(new GridLayout(2, 1));
+        selectedObject.setLayout(new BoxLayout(selectedObject, BoxLayout.PAGE_AXIS));
         JPanel select = new JPanel();
         JPanel selectedStats = new JPanel(new GridLayout(2, 1));
-        selectedStats.setBorder(new EmptyBorder(0, 0, 100, 0));
+        selectedStats.setBorder(new EmptyBorder(0, 0, 50, 0));
 
         this.objectLabels = new JLabel[2];
 
@@ -87,9 +84,29 @@ class Sliders extends JPanel implements ActionListener {
             stats.add(label);
         }
 
-        this.add(pane);
-        this.add(stats);
-        this.add(selectedObject);
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weighty = 1;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.ipadx = 20;
+        gbc.ipady = 10;
+        this.add(pane, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.weighty = 0.5;
+        gbc.ipady = 10;
+        this.add(stats, gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.weighty = 1;
+        this.add(selectedObject, gbc);
 
         this.setVisible(true);
     }

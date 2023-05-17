@@ -33,7 +33,7 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
     private final int AGE_OF_CONSENT = 18;
 
     /** The amount of years that must go by before this person can reproduce again */
-    private final int REPRODUCTION_COOLDOWN = 2;
+    private final int REPRODUCTION_COOLDOWN = 3;
 
     /** The age when this person reproduced, which allows a cooldown to be implemented */
     private int lastReproduced = AGE_OF_CONSENT - REPRODUCTION_COOLDOWN;
@@ -86,6 +86,8 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_2_LEFT_SPRITES);
             this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
         }
+
+
 
         this.lastDirection = Direction.random();
         this.updateSprite(this.lastDirection);
