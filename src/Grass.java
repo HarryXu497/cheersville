@@ -4,12 +4,12 @@ import java.util.List;
 /**
  * represents a grass game object
  * Additional features:
- *  - Sprites
- *      - currentSprite instance variable (line 29)
  *  - Non-constant nutritional value
- *      - getNutritionalValue method (line 76)
+ *      - getNutritionalValue method (line 75)
  *  - Health loss per iteration proportional to age
- *      - update method (line 85)
+ *      - update method (line 84)
+ *  - Sprites
+ *      - animations and sprites (line 37)
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */
@@ -24,7 +24,7 @@ public class Grass extends GameObject {
      */
     public static double REPRODUCTION_THRESHOLD = 0.25;
 
-    /** A number between 0 and 1 that determines the percentage of health transfered to the consumer */
+    /** A number between 0 and 1 that determines the percentage of health transferred to the consumer */
     public static double NUTRITIONAL_VALUE_FACTOR = 0.5;
 
     /**

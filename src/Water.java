@@ -1,8 +1,7 @@
-import java.awt.*;
-
-
 /**
  * represents a water game object, which acts as a barrier to other game objects
+ *  - Sprites
+ *      - animations and sprites
  * @author Harry Xu
  * @version 1.0 - May 13th 2023
  */

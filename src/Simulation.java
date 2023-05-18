@@ -7,22 +7,27 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
-/* [MatrixDisplayWithMouse.java]
- * A small program showing how to use the MatrixDisplayWithMouse class
- *  NOTE - A lot of things to fix here!
- * @author Mangat
- */
-
-
-class MatrixDisplayWithMouse extends JFrame {
+/**
+ * The top-level JFrame for the Cheersville simulation
+ * Addition features
+ *  - Ability to add different objects upon click and to select and control a zombie or player
+ *      - inner class MatrixPanelKeyListener and class ClickActions
+ * @author Harry Xu + Mr.Mangat
+ * @version 1.0 - May 17th 2023
+ * */
+class Simulation extends JFrame {
 
     int maxX,maxY, GridToScreenRatio;
     GameObject[][] matrix;
     Sliders sliders;
 
+    /** The game object type to add upon click */
     public static ClickActions gameObjectToAdd;
 
-    MatrixDisplayWithMouse(String title, GameObject[][] matrix) {
+    /**
+     * constructs the simulation frame and initializes components
+     */
+    public Simulation(String title, GameObject[][] matrix) {
         super(title);
 
         this.matrix = matrix;
@@ -33,9 +38,13 @@ class MatrixDisplayWithMouse extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 
+        // Simulation panel
         MatrixPanel simulation = new MatrixPanel();
+
+        // Sliders and stats panel
         this.sliders = new Sliders();
 
+        // JSplitPane to separate teh two
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, simulation, this.sliders);
         splitPane.setDividerLocation(GridToScreenRatio * matrix[0].length);
 
@@ -43,24 +52,37 @@ class MatrixDisplayWithMouse extends JFrame {
 
         simulation.setMinimumSize(new Dimension(GridToScreenRatio * matrix[0].length, this.getHeight()));
 
+        // Add to JFrame
         this.add(splitPane);
 
         this.setVisible(true);
 
+        // Keyboard listener
         addKeyListener(new MatrixPanelKeyListener());
     }
 
+    /**
+     * refresh
+     * Refreshes and repaints the data of this frame and its children
+     */
     public void refresh() {
         this.sliders.refresh();
         this.repaint();
     }
 
-    //Inner Class
+    /**
+     * the grid and simulation in the user interface
+     * @author Harry Xu
+     * @version 1.0 - May 17th 2023
+     * */
     class MatrixPanel extends JPanel {
 
         Image[][] dirtSprites;
 
-        MatrixPanel() {
+        /**
+         * constructs the matrix panel and initializes components
+         */
+        public MatrixPanel() {
             // Scale the images
             SpriteSheet.scale(GridToScreenRatio);
 
@@ -76,6 +98,10 @@ class MatrixDisplayWithMouse extends JFrame {
             addMouseListener(new MatrixPanelMouseListener());
         }
 
+        /**
+         * draws the images on the simulation panel
+         * @param g the graphic context to draw on
+         */
         public void paintComponent(Graphics g) {
             super.repaint();
 
@@ -87,16 +113,19 @@ class MatrixDisplayWithMouse extends JFrame {
                 for(int j = 0; j<matrix.length;j=j+1)  {
                     GameObject currentObject = matrix[i][j];
 
+                    // Draw dirt
                     g.drawImage(
                         dirtSprites[i][j],
                         j*GridToScreenRatio, i*GridToScreenRatio, null
                     );
 
+                    // Draw a red tile around the selected object
                     if ((Main.selectedObject != null) && (currentObject == Main.selectedObject)) {
                         g.setColor(Color.RED);
                         g.fillRect(j * GridToScreenRatio, i * GridToScreenRatio, GridToScreenRatio, GridToScreenRatio);
                     }
 
+                    // Draw game object
                     if (currentObject != null) {
                         g.drawImage(
                             currentObject.draw(),
@@ -112,17 +141,28 @@ class MatrixDisplayWithMouse extends JFrame {
     }
 
 
-    //Mouse Listener
+    /**
+     * the mouse listener for the simulation
+     * @author Harry Xu
+     * @version 1.0 - May 17th 2023
+     */
     class MatrixPanelMouseListener implements MouseListener{
-        //Mouse Listener Stuff
+
+        /**
+         * mousePressed
+         * invoked when a mouse button is pressed
+         * @param e the mouse event object
+         */
         public void mousePressed(MouseEvent e) {
             requestFocus();
 
             Point clickedPoint = e.getPoint();
 
+            // calculate corresponding tile
             int x = clickedPoint.x / GridToScreenRatio;
             int y = clickedPoint.y / GridToScreenRatio;
 
+            // Add selected item if the spot is available
             if (Utils.validPosition(x, y, matrix) && (!(matrix[y][x] instanceof Water))) {
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     // Add selected entity
@@ -149,7 +189,12 @@ class MatrixDisplayWithMouse extends JFrame {
 
     }
 
-    class MatrixPanelKeyListener implements KeyListener {
+    /**
+     * the keyboard listener for the simulation
+     * @author Harry Xu
+     * @version 1.0 - May 17th 2023
+     */
+    static class MatrixPanelKeyListener implements KeyListener {
 
         @Override
         public void keyTyped(KeyEvent e) {}
@@ -161,10 +206,12 @@ class MatrixDisplayWithMouse extends JFrame {
          */
         @Override
         public void keyPressed(KeyEvent e) {
+            // Return if no selected object
             if (Main.selectedObject == null) {
                 return;
             }
 
+            // Map keys to directions
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_UP:
                     Main.selectedObject.setPlayerMove(Direction.UP);

@@ -4,7 +4,9 @@ import java.awt.*;
  * represents an abstract game object
  * Additional features:
  *  - Exceptions
- *      - exceptions are thrown if illegal arguments (e.g. negative health or age) are inputted (line 37, 40, 62, 65, and 89)
+ *      - exceptions are thrown if illegal arguments (e.g. negative health or age) or null pointers are inputted (line 44, 46, 70, 73, and 96, 115)
+ *  - Sprites
+ *      - currentSprite variable and draw method allows game object to draw a sprite to the UI (line 27, 108)
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */

@@ -1,25 +1,33 @@
-/* [GridTest.java]
- * A program to demonstrate usage of DisplayGrid.java.
- * @author Mangat
- */
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * [Main.java]
+ * Runs a simulation with swing of the town of Cheersville, with people, zombies, grass, and water
+ * Additional features:
+ *  - statistic variables which are displayed in the UI
+ *      - generation, numPeople, numZombie, numGrass (line 25, 27, 28, 29)
+ *  - player controllable game objects
+ *      - static selectedObject variable, {@link Person} and {@link Zombie} both implement {@link Controllable}
+ *  - JOptionPane to get game board size from the user + retrying with error handling
+ *      - line 49 - 75
+ * @author Harry Xu
+ * @version 1.0 - May 17th 2023
+ */
 class Main {
 
     /** A double between 0 and 1 that determines how often new grass is added */
     public static double NEW_GRASS_THRESHOLD = 0.1;
 
     /** The generation number */
-    public static int GENERATION = 0;
+    public static int generation = 0;
 
     /** Game object counts */
-    public static int NUM_PEOPLE = 0;
-    public static int NUM_ZOMBIE = 0;
-    public static int NUM_GRASS = 0;
+    public static int numPeople = 0;
+    public static int numZombie = 0;
+    public static int numGrass = 0;
 
     /** selected controllable entity */
     public static Controllable selectedObject;
@@ -70,20 +78,20 @@ class Main {
 
         //Set up Grid Panel
         // DisplayGrid grid = new DisplayGrid(map);
-        MatrixDisplayWithMouse grid = new MatrixDisplayWithMouse("Cheersville", map);
+        Simulation grid = new Simulation("Cheersville", map);
 
         while(true) {
             //Display the grid on a Panel
             grid.refresh();
 
-            GENERATION++;
+            generation++;
 
             //Small delay
             try{ Thread.sleep(100); }catch(Exception e) {};
 
 
             // Initialize Map (Making changes to map)
-            moveItemsOnGrid(map);
+            nextGeneration(map);
 
             //Display the grid on a Panel
             grid.refresh();
@@ -91,8 +99,12 @@ class Main {
     }
 
 
-    // Method to simulate grid movement
-    public static void moveItemsOnGrid(GameObject[][] map) {
+    /**
+     * nextGeneration
+     * computes the next generation of the simulation
+     * @param map the board of game objects
+     */
+    public static void nextGeneration(GameObject[][] map) {
 
         GameObject[][] mapCopy = map.clone();
 
@@ -100,14 +112,16 @@ class Main {
             mapCopy[i] = map[i].clone();
         }
 
-        NUM_PEOPLE = 0;
-        NUM_ZOMBIE = 0;
-        NUM_GRASS = 0;
+        // Reset statistic counts
+        numPeople = 0;
+        numZombie = 0;
+        numGrass = 0;
 
         for (int y = 0; y < mapCopy.length; y++) {
             for (int x = 0; x < mapCopy[y].length; x++) {
                 GameObject currentGameObj = mapCopy[y][x];
 
+                // Skip null values
                 if (currentGameObj == null) {
                     continue;
                 }
@@ -126,21 +140,24 @@ class Main {
 
                 // Object counts
                 if (currentGameObj instanceof Person) {
-                    NUM_PEOPLE++;
+                    numPeople++;
                 }
                 if (currentGameObj instanceof Zombie) {
-                    NUM_ZOMBIE++;
+                    numZombie++;
                 }
                 if (currentGameObj instanceof Grass) {
-                    NUM_GRASS++;
+                    numGrass++;
                 }
 
                 // Move object if it has open adjacent tiles and implements Movable
-                if ((currentGameObj instanceof Movable) && (canMove(x, y, map))) {
+                if ((currentGameObj instanceof Movable) && (Utils.canMove(x, y, map))) {
                     Point newLocation;
 
+                    // Moves the selected object according to the player
                     if (currentGameObj == selectedObject) {
-                        newLocation = directionToTile(x, y, ((Controllable) currentGameObj).playerMove());
+                        newLocation = Utils.directionToTile(x, y, ((Controllable) currentGameObj).playerMove());
+
+                        // Reset move direction after each move
                         ((Controllable) currentGameObj).setPlayerMove(null);
                     } else {
                         // If the person is hungry, move them towards the closest grass tile
@@ -149,6 +166,7 @@ class Main {
                             Point target = null;
                             Person p = ((Person) currentGameObj);
 
+                            // Find the closest grass in vision
                             for (int grassY = y - p.getVision(); grassY <= y + p.getVision(); grassY++) {
                                 for (int grassX = x - p.getVision(); grassX <= y + p.getVision(); grassX++) {
                                     if ((Utils.validPosition(grassX, grassY, map)) && (map[grassY][grassX] instanceof Grass)) {
@@ -165,16 +183,14 @@ class Main {
                             if (target != null) {
                                 Direction direction = ((Person) currentGameObj).move(new Point(x, y), target);
 
-                                newLocation = directionToTile(x, y, direction);
+                                newLocation = Utils.directionToTile(x, y, direction);
+                            } else {
+                                // Target not found: hungry but no grass -> move randomly
+                                newLocation = Utils.generateNextPosition(x, y, (Movable) currentGameObj, map);
                             }
-                            else {
-                                // If hungry but no grass, move randomly
-                                newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
-                            }
-                        }
-                        else {
+                        } else {
                             // Else use random movement
-                            newLocation = generateNextPosition(x, y, (Movable) currentGameObj, map);
+                            newLocation = Utils.generateNextPosition(x, y, (Movable) currentGameObj, map);
                         }
                     }
 
@@ -183,7 +199,7 @@ class Main {
 
                     // Check if position is valid
                     if (Utils.validPosition(newX, newY, map)) {
-                        // Collision
+                        // Collision occurs
                         if ((map[newY][newX] != null) && (currentGameObj instanceof Collidable)) {
                             GameObject objToAdd = ((Collidable) currentGameObj).collide(map[newY][newX]);
 
@@ -194,24 +210,30 @@ class Main {
                                 int babyX;
                                 int babyY;
 
-                                if (canMove(x, y, map)) {
-                                    // Random adjacent tile
+                                if (Utils.canMove(x, y, map)) {
+                                    // Generate random valid adjacent tile
                                     do {
                                         Direction direction = ((Movable) baby).move();
-                                        newLocation = directionToTile(x, y, direction);
-                                    } while (!Utils.validPosition(newLocation, map) || ((map[newLocation.y][newLocation.x] != null) && (!(map[newLocation.y][newLocation.x] instanceof Grass))));
+                                        newLocation = Utils.directionToTile(x, y, direction);
+                                    } while ((!Utils.validPosition(newLocation, map)) ||
+                                            ((map[newLocation.y][newLocation.x] != null) &&
+                                            (!(map[newLocation.y][newLocation.x] instanceof Grass))));
 
                                     babyX = newLocation.x;
                                     babyY = newLocation.y;
 
                                 } else {
-                                    // Random spawn location
+                                    // Random spawn location as there is no room around the parents
                                     do {
                                         babyX = (int) (Math.random() * map[0].length);
                                         babyY = (int) (Math.random() * map.length);
-                                    } while ((!Utils.validPosition(babyX, babyY, map)) || ((map[babyY][babyX] != null) && (!(map[babyY][babyX] instanceof Grass))));
+                                    } while ((!Utils.validPosition(babyX, babyY, map)) ||
+                                            ((map[babyY][babyX] != null) &&
+                                            (!(map[babyY][babyX] instanceof Grass))));
 
                                 }
+
+                                // Add baby to map
                                 map[babyY][babyX] = baby;
                             }
 
@@ -219,11 +241,6 @@ class Main {
                             if (objToAdd instanceof Zombie) {
                                 map[newY][newX] = objToAdd;
                             }
-
-//                            if (map[newY][newX] instanceof Grass) {
-//                                map[newY][newX] = currentGameObj;
-//                                map[y][x] = null;
-//                            }
                         } else {
                             map[newY][newX] = currentGameObj;
                             map[y][x] = null;
@@ -237,7 +254,7 @@ class Main {
                     List<Direction> neighbors = ((Grass) currentGameObj).reproduce();
 
                     for (Direction neighbor : neighbors) {
-                        Point point = directionToTile(x, y, neighbor);
+                        Point point = Utils.directionToTile(x, y, neighbor);
 
                         if ((Utils.validPosition(point, map)) && (map[point.y][point.x] == null)) {
                             map[point.y][point.x] = new Grass();
@@ -250,6 +267,7 @@ class Main {
         // Add new grass
         boolean addNewGrass = Math.random() < NEW_GRASS_THRESHOLD;
 
+        // Add grass randomly
         if (addNewGrass) {
             int numGrass = (int) (Math.random() * 3);
 
@@ -262,75 +280,5 @@ class Main {
                 }
             }
         }
-    }
-
-    /**
-     * canMove
-     * checks if a game object at a specified point has any open adjacent tiles
-     * The adjacent tile can also be grass, as game objects can walk over grass
-     * */
-    private static boolean canMove(int x, int y, GameObject[][] map) {
-        if (
-                ((!Utils.validPosition(x + 1, y, map)) || ((map[y][x + 1] != null) && !(map[y][x + 1] instanceof Grass))) &&
-                ((!Utils.validPosition(x - 1, y, map)) || ((map[y][x - 1] != null) && !(map[y][x - 1] instanceof Grass))) &&
-                ((!Utils.validPosition(x, y + 1, map)) || ((map[y + 1][x] != null) && !(map[y + 1][x] instanceof Grass))) &&
-                ((!Utils.validPosition(x, y - 1, map)) || ((map[y - 1][x] != null) && !(map[y - 1][x] instanceof Grass)))
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * generateNextPosition
-     * generates a valid new position point in the map using a game object
-     * @param x the x coordinate of the game object
-     * @param y the y coordinate of the game object
-     * @param currentGameObj the game object to generate the directions from
-     * @param map the game map
-     * */
-    private static Point generateNextPosition(int x, int y, Movable currentGameObj, GameObject[][] map) {
-        Point newLocation;
-
-        do {
-            Direction direction = currentGameObj.move();
-            newLocation = directionToTile(x, y, direction);
-        } while ((!Utils.validPosition(newLocation, map)));
-
-        return newLocation;
-    }
-
-    /**
-     * directionToTile
-     * maps a direction and an origin point to the corresponding neighbor
-     * @param x the x coordinate of the origin point
-     * @param y the y coordinate of the origin point
-     * @param direction the direction to traverse
-     * @return the new generated point
-     * */
-    private static Point directionToTile(int x, int y, Direction direction) {
-        // Return the current point if direction is null
-        if (direction == null) {
-            return new Point(x, y);
-        }
-
-        // Move the object
-        switch (direction) {
-            case UP:
-                y--;
-                break;
-            case DOWN:
-                y++;
-                break;
-            case LEFT:
-                x--;
-                break;
-            case RIGHT:
-                x++;
-                break;
-        }
-
-        return new Point(x, y);
     }
 }

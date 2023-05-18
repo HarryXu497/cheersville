@@ -1,5 +1,11 @@
 /**
  * represents a zombie game object
+ * Additional features
+ *  - Movement: a zombie is more likely to continue walking in the same direction
+ *      - SAME_DIRECTION_CHANCE constant (line 13)
+ *      - lastDirection to track the previous direction (line 25)
+ *  - Sprites
+ *      - animations and sprites (line 21-24)
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  * */
@@ -148,12 +154,23 @@ public class Zombie extends GameObject implements Movable, Collidable, Controlla
         }
     }
 
+    /**
+     * playerMove
+     * returns the direction to move in to the caller
+     * @return the direction to move in as an enum constant
+     */
     @Override
     public Direction playerMove() {
         this.updateSprite(this.playerDirection);
         return this.playerDirection;
     }
 
+    /**
+     * setPlayerMove
+     * sets the direction in which the player moves,
+     * which allows outside output (i.e. the keyboard) to control movement
+     * @param direction the new direction to move towards
+     */
     @Override
     public void setPlayerMove(Direction direction) {
         this.playerDirection = direction;

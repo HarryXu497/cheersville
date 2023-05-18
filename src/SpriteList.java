@@ -3,6 +3,7 @@ import java.util.List;
 
 /**
  * A list of sprites that allows for easy animation in game objects
+ * keeps track on a list of images and current index which wraps around once the end is reached
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */

@@ -8,6 +8,13 @@ import java.awt.event.ActionListener;
 
 /**
  * A custom sliders JPanel that manages the game parameters and displays game statistics
+ * Additional Features
+ *  - Sliders to adjust game parameters (e.g. Grass reproduction rate)
+ *      - inner classes PersonPane, GrassPane, ZombiePane
+ *  - Simulation statistics
+ *      - line 44-57, refresh method
+ *  - UI to add game objects or take control of objects using a dropdown menu
+ *      - line 60-94, actionPerformed ChangeListener method
  * @author Harry Xu
  * @version 1.0 - May 15th 2023
  */
@@ -37,16 +44,16 @@ class Sliders extends JPanel implements ActionListener {
         // Stat labels
         this.labels = new JLabel[4];
 
-        this.labels[0] = new JLabel("Generation " + Main.GENERATION, SwingConstants.CENTER);
+        this.labels[0] = new JLabel("Generation " + Main.generation, SwingConstants.CENTER);
         this.labels[0].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
 
-        this.labels[1] = new JLabel("Humans: " + Main.NUM_PEOPLE, SwingConstants.CENTER);
+        this.labels[1] = new JLabel("Humans: " + Main.numPeople, SwingConstants.CENTER);
         this.labels[1].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 
-        this.labels[2] = new JLabel("Zombies: " + Main.NUM_ZOMBIE, SwingConstants.CENTER);
+        this.labels[2] = new JLabel("Zombies: " + Main.numZombie, SwingConstants.CENTER);
         this.labels[2].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 
-        this.labels[3] = new JLabel("Grass: " + Main.NUM_GRASS, SwingConstants.CENTER);
+        this.labels[3] = new JLabel("Grass: " + Main.numGrass, SwingConstants.CENTER);
         this.labels[3].setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 
         // Click select dropdown
@@ -56,6 +63,7 @@ class Sliders extends JPanel implements ActionListener {
         JPanel selectedStats = new JPanel(new GridLayout(2, 1));
         selectedStats.setBorder(new EmptyBorder(0, 0, 50, 0));
 
+        // Selected object stats
         this.objectLabels = new JLabel[2];
 
         this.objectLabels[0] = new JLabel("", JLabel.CENTER);
@@ -66,6 +74,7 @@ class Sliders extends JPanel implements ActionListener {
         selectedStats.add(this.objectLabels[0]);
         selectedStats.add(this.objectLabels[1]);
 
+        // Dropdown label
         JLabel selectLabel = new JLabel("Upon click, add a ", JLabel.CENTER);
         selectLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
         JComboBox<ClickActions> dropdown = new JComboBox<>(ClickActions.values());
@@ -84,6 +93,7 @@ class Sliders extends JPanel implements ActionListener {
             stats.add(label);
         }
 
+        // Layout
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.gridx = 1;
@@ -117,10 +127,10 @@ class Sliders extends JPanel implements ActionListener {
      * Refreshes the game statistics panel and repaints
      */
     public void refresh() {
-        this.labels[0].setText("Generation " + Main.GENERATION);
-        this.labels[1].setText("Humans: " + Main.NUM_PEOPLE);
-        this.labels[2].setText("Zombies: " + Main.NUM_ZOMBIE);
-        this.labels[3].setText("Grass: " + Main.NUM_GRASS);
+        this.labels[0].setText("Generation " + Main.generation);
+        this.labels[1].setText("Humans: " + Main.numPeople);
+        this.labels[2].setText("Zombies: " + Main.numZombie);
+        this.labels[3].setText("Grass: " + Main.numGrass);
 
         if (Main.selectedObject == null) {
             this.objectLabels[0].setText("");
@@ -134,10 +144,15 @@ class Sliders extends JPanel implements ActionListener {
         this.repaint();
     }
 
+    /**
+     * actionPerformed
+     * invoked when an action occurs
+     * @param e the event object
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         JComboBox<ClickActions> cb = (JComboBox<ClickActions>) e.getSource();
-        MatrixDisplayWithMouse.gameObjectToAdd = (ClickActions) cb.getSelectedItem();
+        Simulation.gameObjectToAdd = (ClickActions) cb.getSelectedItem();
     }
 
     /**

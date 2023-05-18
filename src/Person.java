@@ -4,15 +4,20 @@ import java.awt.*;
  * Represents a person game object
  * Changes:
  *  - Hungry-ness: Getting food will be prioritized over reproduction if a person is hungry
- *      - HUNGRY_THRESHOLD constant (line 24)
- *      - isHungry method (line 110)
+ *      - HUNGRY_THRESHOLD constant (line 29)
+ *      - isHungry method (line 149)
  *  - Movement: a person is more likely to continue walking in the same direction
- *      - SAME_DIRECTION_CHANCE constant (line 39)
- *      - lastDirection to track the previous direction (line 53)
+ *      - SAME_DIRECTION_CHANCE constant (line 47)
+ *      - lastDirection to track the previous direction (line 62)
+ *      - can move smartly towards a target (line 258)
  *  - Sprites
- *      - animations and sprites (line 42, 44, 45, 46, 47)
+ *      - animations and sprites (line 56-59)
  *  - Reproduction cooldown
- *      - lastReproduced instance variable (line 36)
+ *      - lastReproduced instance variable (line 44)
+ *  - Vision
+ *      - the person can only see grass within a certain region around it (line 65)
+ *  - Aging
+ *      - Health is lost at a non-linear rate which increases exponentially as age increases (line 180)
  * @author Harry Xu
  * @version 1.0 - May 8th 2023
  */
@@ -86,8 +91,6 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
             this.walkingLeftSprites = new SpriteList(SpriteSheet.PERSON_2_LEFT_SPRITES);
             this.walkingRightSprites = new SpriteList(SpriteSheet.PERSON_2_RIGHT_SPRITES);
         }
-
-
 
         this.lastDirection = Direction.random();
         this.updateSprite(this.lastDirection);
@@ -343,12 +346,23 @@ public class Person extends GameObject implements Movable, Collidable, DirectedM
         }
     }
 
+    /**
+     * playerMove
+     * returns the direction to move in to the caller
+     * @return the direction to move in as an enum constant
+     */
     @Override
     public Direction playerMove() {
         this.updateSprite(this.playerDirection);
         return this.playerDirection;
     }
 
+    /**
+     * setPlayerMove
+     * sets the direction in which the player moves,
+     * which allows outside output (i.e. the keyboard) to control movement
+     * @param direction the new direction to move towards
+     */
     @Override
     public void setPlayerMove(Direction direction) {
         this.playerDirection = direction;
